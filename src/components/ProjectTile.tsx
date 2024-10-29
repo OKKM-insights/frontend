@@ -1,11 +1,5 @@
 import React from 'react';
-
-interface Project {
-  title: string;
-  description: string;
-  status: 'new' | 'live' | 'current' | 'inprogress' | 'completed';
-  progress?: number;
-}
+import { Project } from '@/types';
 
 interface ProjectTileProps {
   project: Project;
