@@ -1,15 +1,21 @@
 import React from 'react';
 import { Project } from '@/types';
+import { useRouter } from 'next/navigation';
 
 interface ProjectTileProps {
   project: Project;
 }
 
 const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
+  const router = useRouter();
+
+  const goToProject = () => {
+    router.push(`/label/${project.title}`);
+  };
   return (
     <div className="w-80 bg-gray-800 text-white border border-white p-4 rounded-lg flex-shrink-0">
       <div className="mb-12">
-        <h5 className="text-xl font-bold truncate">{project.title}</h5>
+        <h5 className="text-xl text-white font-bold truncate">{project.title}</h5>
         <p className="text-gray-400 text-sm overflow-hidden">{project.description}</p>
       </div>
       <div className="mt-4">
@@ -34,6 +40,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
               ? 'bg-green-500 hover:bg-green-600'
               : 'bg-gray-500 hover:bg-gray-600'
           }`}
+          onClick={goToProject}
         >
           {project.status === 'new'
             ? 'Create Project'

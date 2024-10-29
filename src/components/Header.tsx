@@ -8,12 +8,15 @@ const Header: React.FC = () => {
 
   const goToLogin = () => {
     router.push('/login');
-    console.log("Hello")
+  };
+
+  const goToHome = () => {
+    router.push('/');
   };
 
   return (
     <header className="flex items-center justify-between h-[10vh] p-4 bg-gray-900">
-      <div className="flex items-center">
+      <div onClick={goToHome} className="flex items-center cursor-pointer">
         <div className="flex items-center justify-center w-10 h-10 bg-green-500 rounded-full">
           <Image
             src="/images/globe-icon.png"
