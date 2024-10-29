@@ -12,7 +12,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex items-center justify-between h-10vh p-4 bg-gray-900">
+    <header className="flex items-center justify-between h-[10vh] p-4 bg-gray-900">
       <div className="flex items-center">
         <div className="flex items-center justify-center w-10 h-10 bg-green-500 rounded-full">
           <Image

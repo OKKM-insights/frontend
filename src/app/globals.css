@@ -26,6 +26,14 @@ body {
   }
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
 .ls-submit-btn {
   background-color: #3b82f6 !important;
   font-size: 16px !important;

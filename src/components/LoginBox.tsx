@@ -45,7 +45,7 @@ const LoginBox: React.FC = () => {
               type="email"
               placeholder="Enter your email"
               className="w-full p-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              required
+              // required
             />
           </div>
 
@@ -56,11 +56,11 @@ const LoginBox: React.FC = () => {
               type="password"
               placeholder="Enter your password"
               className="w-full p-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              required
+              // required
             />
           </div>
 
-          <button type="submit" className="w-full py-3 mt-4 text-lg font-semibold text-white bg-blue-600 rounded hover:bg-blue-700">
+          <button className="w-full py-3 mt-4 text-lg font-semibold text-white bg-blue-600 rounded hover:bg-blue-700">
             Sign In
           </button>
         </form>

@@ -8,14 +8,14 @@ const Home: React.FC = () => {
     return (
       <>
         <Header />
-        <main className="relative flex flex-col items-center justify-center flex-grow min-h-[89.5vh] bg-black text-center">
+        <main className="relative flex flex-col items-center justify-center flex-grow min-h-[90vh] bg-black text-center">
           <div className="absolute inset-0 z-0">
             <Image
               src="/images/satellite-image.png"
               alt="Satellite imagery background"
               layout="fill"
               objectFit="cover"
-              className="opacity-50"
+              className="opacity-30"
             />
           </div>
           
