@@ -31,7 +31,7 @@ const ProjectHub: React.FC = () => {
 
   return (
     <>
-      <Header />
+      <Header status="logged_in"/>
       <div className="mx-auto p-8 bg-black min-h-[90vh]">
         <h1 className="text-4xl font-bold mb-8 text-white">Projects Dashboard</h1>
         <ProjectSection title="New Projects" projects={projects.filter(p => p.status === "new")} color="#3b82f6" />

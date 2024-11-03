@@ -7,7 +7,7 @@ import Header from '@/components/Header';
 const Home: React.FC = () => {
     return (
       <>
-        <Header />
+        <Header status='not_logged_in' />
         <main className="relative flex flex-col items-center justify-center flex-grow min-h-[90vh] bg-black text-center">
           <div className="absolute inset-0 z-0">
             <Image

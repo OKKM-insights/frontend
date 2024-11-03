@@ -1,6 +1,7 @@
 import React from 'react';
 import { Project } from '@/types';
 import { useRouter } from 'next/navigation';
+import NewProjDialog from './NewProjDialog';
 
 interface ProjectTileProps {
   project: Project;
@@ -30,29 +31,28 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
             <p className="mt-2 text-sm text-gray-500">{project.progress}% Complete</p>
           </div>
         )}
-        <button
-          className={`w-full p-3 rounded-md text-white ${
-            project.status === 'new'
-              ? 'bg-blue-600 hover:bg-blue-700'
+        {project.status === "new" ? 
+          <NewProjDialog />
+          : 
+          <button
+            className={`w-full p-3 rounded-md text-white ${
+                project.status === 'live'
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : project.status === 'inprogress' || project.status === 'current'
+                ? 'bg-green-500 hover:bg-green-600'
+                : 'bg-gray-500 hover:bg-gray-600'
+            }`}
+            onClick={goToProject}
+          >
+            { project.status === 'inprogress'
+              ? 'Continue'
               : project.status === 'live'
-              ? 'bg-blue-600 hover:bg-blue-700'
-              : project.status === 'inprogress' || project.status === 'current'
-              ? 'bg-green-500 hover:bg-green-600'
-              : 'bg-gray-500 hover:bg-gray-600'
-          }`}
-          onClick={goToProject}
-        >
-          {project.status === 'new'
-            ? 'Create Project'
-            : project.status === 'inprogress'
-            ? 'Continue'
-            : project.status === 'live'
-            ? 'Start Labeling'
-            : project.status === 'current'
-            ? 'View Progress'
-            : 'View Details'}
-        </button>
-      </div>
+              ? 'Start Labeling'
+              : project.status === 'current'
+              ? 'View Progress'
+              : 'View Details'}
+          </button>}
+        </div>
     </div>
   );
 };

@@ -13,7 +13,7 @@ const Label: React.FC = () => {
   const { title } = useParams();
   return (
     <>
-        <Header />
+        <Header status='logged_in'/>
         <div className="bg-black min-h-[90vh]">
             <LabelStudioUI />
         </div>
