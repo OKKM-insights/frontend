@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import LabelStudio from "label-studio";
 import "label-studio/build/static/css/main.css";
 
-const LabelStudioUI = (props) => {
+const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-unused-vars
   const [selected, setSelected] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState(0); // Track the current task ID
   const labelStudioRef = useRef(null); // Store the LabelStudio instance
@@ -79,7 +79,7 @@ const LabelStudioUI = (props) => {
         }, 50); // Adjust the delay if necessary
       },
 
-      onSubmitAnnotation: function (LS, annotation) {
+      onSubmitAnnotation: function (LS, annotation) {// eslint-disable-line @typescript-eslint/no-unused-vars
         console.log(annotation.serializeAnnotation());
         setSelected(!selected);
         getAnnotations();
@@ -89,7 +89,7 @@ const LabelStudioUI = (props) => {
         setCurrentTaskId(nextTaskId);
       },
 
-      onSkipTask: function (LS) {
+      onSkipTask: function (LS) {// eslint-disable-line @typescript-eslint/no-unused-vars
         console.log(`Task ${taskId + 1} skipped.`);
         
         // Move to the next task

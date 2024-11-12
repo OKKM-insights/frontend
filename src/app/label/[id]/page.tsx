@@ -10,7 +10,7 @@ const LabelStudioUI = dynamic(() => import('../../../components/LabelStudioUI'),
 });
 
 const Label: React.FC = () => {
-  const { title } = useParams();
+  const { title } = useParams(); // eslint-disable-line @typescript-eslint/no-unused-vars
   return (
     <>
         <Header status='logged_in'/>

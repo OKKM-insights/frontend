@@ -70,7 +70,7 @@ const LoginBox: React.FC = () => {
           <a href="/forgot-password" className="text-blue-400 hover:text-blue-500">Forgot password?</a>
         </div>
         <div className="mt-6 text-center">
-          <p className="text-white">Don't have an account? <a href="/register" className="text-green-400 hover:text-green-500">Register here</a></p>
+          <p className="text-white">Need an account? <a href="/register" className="text-green-400 hover:text-green-500">Register here</a></p>
         </div>
       </div>
   );
