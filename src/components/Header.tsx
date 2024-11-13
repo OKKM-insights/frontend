@@ -41,6 +41,7 @@ const Header: React.FC<HeaderProps> = ({status}) => {
             <Button
               variant="ghost"
               className="text-white hover:text-green-400 flex items-center space-x-2"
+              onClick={goToHome}
             >
               <LogOut className="w-5 h-5" />
               <span>Logout</span>

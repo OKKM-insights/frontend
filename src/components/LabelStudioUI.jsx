@@ -16,12 +16,15 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
     labelStudioRef.current = new LabelStudio("label-studio", {
       config: taskId === 0 ?`
         <View>
-          <RectangleLabels name="tag" toName="img">
+          <Header value="Label the Following Animals"
+                style="font-weight: normal"/>
+          <RectangleLabels name="tag" toName="img" allowEmpty="false">
               <Label value="Turtle"></Label>
               <Label value="Parrot"></Label>
               <Label value="Rabbit"></Label>
           </RectangleLabels>
           <Image name="img" value="$image"></Image>
+
         </View>
       ` : `<View>
             <Choices name="sentiment" toName="img" choice="single" showInLine="true">
@@ -32,7 +35,10 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
             <Image name="img" value="$image"></Image>
           </View>
       `,
-      
+          // Add for background picture
+          //<View style="position: absolute; top: 50px; left: 0; z-index: -1;">
+          //     <Image name="img2" value="$image"></Image>
+          // </View>
       interfaces: [
         "panel",
         "update",
@@ -57,26 +63,13 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
         }
       },
 
+      continuousLabeling: true,
+
       onLabelStudioLoad: function (LS) {
         const c = LS.annotationStore.addAnnotation({
           userGenerate: true
         });
         LS.annotationStore.selectAnnotation(c.id);
-
-        setTimeout(() => {
-          const submitButton = document.querySelector('.ls-submit-btn');
-          
-          if (submitButton) {
-            // Find the text node inside the button that doesn't have any class (ignoring the icon)
-            submitButton.childNodes.forEach((node) => {
-              if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-                node.textContent = "Custom Submit Text"; // Change only the text node
-              }
-            });
-          } else {
-            console.warn('Submit button not found');
-          }
-        }, 50); // Adjust the delay if necessary
       },
 
       onSubmitAnnotation: function (LS, annotation) {// eslint-disable-line @typescript-eslint/no-unused-vars
@@ -95,6 +88,10 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
         // Move to the next task
         const nextTaskId = (taskId + 1) % images.length;
         setCurrentTaskId(nextTaskId);
+      },
+
+      onEntityCreate: function (LS) {
+        console.log(`Task ${taskId + 1} created.`);
       }
     });
   };

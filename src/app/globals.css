@@ -94,6 +94,10 @@ body {
   font-family: Verdana, Tahoma, monospace !important;
 }
 
+.konvajs-content canvas {
+  padding: 0px !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
