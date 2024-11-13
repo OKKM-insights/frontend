@@ -90,9 +90,9 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
         setCurrentTaskId(nextTaskId);
       },
 
-      onEntityCreate: function (LS) {
-        console.log(`Task ${taskId + 1} created.`);
-      }
+      // onEntityCreate: function (LS) {
+      //   console.log(`Task ${taskId + 1} created.`);
+      // }
     });
   };
 
