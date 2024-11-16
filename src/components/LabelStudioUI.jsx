@@ -7,38 +7,34 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
   const [currentTaskId, setCurrentTaskId] = useState(0); // Track the current task ID
   const labelStudioRef = useRef(null); // Store the LabelStudio instance
   const images = [
-    `/images/pets.jpg`,
-    `/images/pet2.jpg`
+    `/images/airport_3.png`,
+    `/images/airport_2.png`,
+    `/images/airport_1.png`
   ];
 
   // Function to initialize Label Studio
   const initializeLabelStudio = (taskId) => {
     labelStudioRef.current = new LabelStudio("label-studio", {
-      config: taskId === 0 ?`
+      config: taskId%2 === 0 ?`
         <View>
-          <Header value="Label the Following Animals"
+          <Header value="Label the Planes"
                 style="font-weight: normal"/>
           <RectangleLabels name="tag" toName="img" allowEmpty="false">
-              <Label value="Turtle"></Label>
-              <Label value="Parrot"></Label>
-              <Label value="Rabbit"></Label>
+              <Label value="Plane"></Label>
           </RectangleLabels>
           <Image name="img" value="$image"></Image>
 
         </View>
       ` : `<View>
+            <Header value="Do you see a plane?"
+                style="font-weight: normal"/>
             <Choices name="sentiment" toName="img" choice="single" showInLine="true">
-              <Choice value="Cat"/>
-              <Choice value="Dog"/>
-              <Choice value="Bird"/>
+              <Choice value="Yes"/>
+              <Choice value="No"/>
             </Choices>
             <Image name="img" value="$image"></Image>
           </View>
       `,
-          // Add for background picture
-          //<View style="position: absolute; top: 50px; left: 0; z-index: -1;">
-          //     <Image name="img2" value="$image"></Image>
-          // </View>
       interfaces: [
         "panel",
         "update",
