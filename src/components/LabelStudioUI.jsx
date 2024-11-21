@@ -44,11 +44,6 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
         "skip",
         "instruction",
       ],
-
-      hotkeys: {
-        "ctrl+enter": "submit",
-        "ctrl+shift+s": "skip",
-      },
       
       user: {
         pk: 1,
