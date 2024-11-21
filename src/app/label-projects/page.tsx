@@ -8,7 +8,7 @@ import Header from '@/components/Header';
 
 const LabelHub: React.FC = () => {
   const projects: Project[] = [
-    { id: '1', title: 'New Satellite Imagery', description: 'Fresh data from EarthSat-3', status: 'live' },
+    { id: '1', title: 'New Airport Imagery', description: 'Fresh data from EarthSat-3', status: 'live' },
     { id: '2', title: 'Urban Development', description: 'Tracking city growth', status: 'inprogress', progress: 60 },
     { id: '3', title: 'Forest Cover Analysis', description: 'Annual deforestation report', status: 'current', progress: 85 },
     { id: '4', title: 'Coastal Erosion Study', description: '5-year comparison', status: 'live' },

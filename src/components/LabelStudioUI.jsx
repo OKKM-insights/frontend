@@ -7,9 +7,9 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
   const [currentTaskId, setCurrentTaskId] = useState(0); // Track the current task ID
   const labelStudioRef = useRef(null); // Store the LabelStudio instance
   const images = [
-    `/images/airport_3.png`,
+    `/images/airport_1.png`,
     `/images/airport_2.png`,
-    `/images/airport_1.png`
+    `/images/airport_3.png`
   ];
 
   // Function to initialize Label Studio
@@ -20,7 +20,8 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
           <Header value="Label the Planes"
                 style="font-weight: normal"/>
           <RectangleLabels name="tag" toName="img" allowEmpty="false">
-              <Label value="Plane"></Label>
+              <Label value="Plane">
+              </Label>
           </RectangleLabels>
           <Image name="img" value="$image"></Image>
 
@@ -110,6 +111,25 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
     }
     return null; // If no annotation is selected
   };
+
+  // Add hotkey bindings
+  useEffect(() => {
+    const handleKeydown = (event) => {
+      if (event.ctrlKey && event.key === "Enter") {
+        const submitButton = document.querySelector("button.ls-submit-btn");
+        if (submitButton) submitButton.click();
+      }
+      if (event.ctrlKey && event.code === "Space") {
+        const skipButton = document.querySelector("button.ls-skip-btn");
+        if (skipButton) skipButton.click();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeydown);
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+    };
+  }, []);
 
   return (
     <div
