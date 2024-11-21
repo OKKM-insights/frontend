@@ -16,6 +16,7 @@ const Home: React.FC = () => {
               layout="fill"
               objectFit="cover"
               className="opacity-30"
+              loading="eager"
             />
           </div>
           
