@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const LoginBox: React.FC = () => {
   const [loginType, setLoginType] = useState<'labeler' | 'client'>('labeler');
@@ -39,38 +41,38 @@ const LoginBox: React.FC = () => {
         {/* Login Form */}
         <form className="flex flex-col gap-4" onSubmit={login}>
           <div className="flex flex-col">
-            <label htmlFor="clientEmail" className="mb-2 text-white text-left">Email</label>
-            <input
+            <Label htmlFor="clientEmail" className="mb-2 text-lg text-white text-left">Email</Label>
+            <Input
               id="clientEmail"
               type="email"
               placeholder="Enter your email"
-              className="w-full p-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+              className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
               // required
             />
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="clientPassword" className="mb-2 text-white text-left">Password</label>
-            <input
+            <Label htmlFor="clientPassword" className="mb-2 text-lg text-white text-left">Password</Label>
+            <Input
               id="clientPassword"
               type="password"
               placeholder="Enter your password"
-              className="w-full p-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+              className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
               // required
             />
           </div>
 
-          <button className="w-full py-3 mt-4 text-lg font-semibold text-white bg-blue-600 rounded hover:bg-blue-700">
+          <button className="w-full py-3 mt-4 text-base font-semibold text-white bg-blue-600 rounded hover:bg-blue-700">
             Sign In
           </button>
         </form>
 
         {/* Links */}
         <div className="mt-4 text-center">
-          <a href="/forgot-password" className="text-blue-400 hover:text-blue-500">Forgot password?</a>
+          <span onClick={() => router.push("/forgot-password")} className="text-blue-400 hover:text-blue-500 cursor-pointer">Forgot password?</span>
         </div>
-        <div className="mt-6 text-center">
-          <p className="text-white">Need an account? <a href="/register" className="text-green-400 hover:text-green-500">Register here</a></p>
+        <div className="mt-2 text-center">
+          <p className="text-white">Need an account? <span onClick={() => router.push("/register")} className="text-green-400 hover:text-green-500 cursor-pointer">Register here</span></p>
         </div>
       </div>
   );

@@ -17,6 +17,10 @@ const Header: React.FC<HeaderProps> = ({status}) => {
     router.push('/login');
   };
 
+  const goToRegister = () => {
+    router.push('/register');
+  };
+
   const goToHome = () => {
     router.push('/');
   };
@@ -55,7 +59,10 @@ const Header: React.FC<HeaderProps> = ({status}) => {
           </>
         : 
           <>
-            <button className="px-4 py-2 text-white bg-green-600 border border-green-500 rounded hover:bg-green-700">
+            <button 
+              className="px-4 py-2 text-white bg-green-600 border border-green-500 rounded hover:bg-green-700"
+              onClick={goToRegister}
+            >
               Register
             </button>
             <button
