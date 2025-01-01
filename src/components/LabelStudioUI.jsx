@@ -20,11 +20,12 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
           <Header value="Label the Planes"
                 style="font-weight: normal"/>
           <RectangleLabels name="tag" toName="img" allowEmpty="false">
-              <Label value="Plane">
-              </Label>
+              <Label value="Plane"/>
           </RectangleLabels>
           <Image name="img" value="$image"></Image>
-
+          <Choices name="noLabelOption" toName="img">
+              <Choice value="Nothing to Label" />
+          </Choices>222
         </View>
       ` : `<View>
             <Header value="Do you see a plane?"
