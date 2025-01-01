@@ -39,9 +39,18 @@ const Header: React.FC<HeaderProps> = ({status}) => {
         </div>
         <span className="ml-4 text-2xl font-bold text-white">OrbitWatch</span>
       </div>
-      <div className="flex gap-2">
+      <div className="flex items-center space-x-2">
         {status === "logged_in" ?
           <>
+            <div className="text-white mr-4">
+              <span className="ml-1 font-semibold">$XXXX.XX</span>
+            </div>
+            <Avatar className="cursor-pointer">
+              <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+              <AvatarFallback>
+                <UserCircle className="w-6 h-6 text-gray-400" />
+              </AvatarFallback>
+            </Avatar>
             <Button
               variant="ghost"
               className="text-white hover:text-green-400 flex items-center space-x-2"
@@ -50,12 +59,6 @@ const Header: React.FC<HeaderProps> = ({status}) => {
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
             </Button>
-            <Avatar className="cursor-pointer">
-              <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-              <AvatarFallback>
-                <UserCircle className="w-6 h-6 text-gray-400" />
-              </AvatarFallback>
-            </Avatar>
           </>
         : 
           <>
