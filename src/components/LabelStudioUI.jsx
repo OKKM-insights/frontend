@@ -25,7 +25,7 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
           <Image name="img" value="$image"></Image>
           <Choices name="noLabelOption" toName="img">
               <Choice value="Nothing to Label" />
-          </Choices>222
+          </Choices>
         </View>
       ` : `<View>
             <Header value="Do you see a plane?"
