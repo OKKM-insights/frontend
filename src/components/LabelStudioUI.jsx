@@ -124,6 +124,25 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
         const skipButton = document.querySelector("button.ls-skip-btn");
         if (skipButton) skipButton.click();
       }
+      if (event.ctrlKey && event.key === "z") {
+        const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+        if (buttons.length > 0 && buttons[0]) {
+          buttons[0].click();
+        }
+      }
+      if (event.ctrlKey && event.key === "y") {
+        const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+        if (buttons.length > 1 && buttons[1]) {
+          buttons[1].click();
+        }
+      }
+      if (event.ctrlKey && event.key === "x") {
+        const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+        if (buttons.length > 2 && buttons[2]) {
+          buttons[2].click();
+        }
+      }
+
     };
 
     document.addEventListener("keydown", handleKeydown);
