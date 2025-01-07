@@ -5,10 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { LogOut, UserCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-
-interface HeaderProps {
-  status: "not_logged_in" | "logged_in";
-}
+import { HeaderProps } from '@/types';
 
 const Header: React.FC<HeaderProps> = ({status}) => {
   const router = useRouter();
