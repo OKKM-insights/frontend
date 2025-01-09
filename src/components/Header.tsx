@@ -22,6 +22,10 @@ const Header: React.FC<HeaderProps> = ({status}) => {
     router.push('/');
   };
 
+  const goToInfo = () => {
+    router.push('/information');
+  };
+
   return (
     <header className="flex items-center justify-between h-[10vh] p-4 bg-gray-900">
       <div onClick={goToHome} className="flex items-center cursor-pointer">
@@ -42,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({status}) => {
             <div className="text-white mr-4">
               <span className="ml-1 font-semibold">$XXXX.XX</span>
             </div>
-            <Avatar className="cursor-pointer">
+            <Avatar onClick={goToInfo} className="cursor-pointer">
               <AvatarImage src="https://github.com/shadcn.png" alt="User" />
               <AvatarFallback>
                 <UserCircle className="w-6 h-6 text-gray-400" />
