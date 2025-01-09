@@ -113,6 +113,16 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
     return null; // If no annotation is selected
   };
 
+  const addCustomTooltip = (button, shortcut) => {
+    const tooltip = document.createElement('span');
+    tooltip.className = 'custom-tooltip';
+    tooltip.innerText = `${shortcut}`;
+  
+    button.classList.add('button-with-tooltip');
+    button.style.position = 'relative'; // Ensure proper positioning
+    button.appendChild(tooltip);
+  };
+
   // Add hotkey bindings
   useEffect(() => {
     const handleKeydown = (event) => {
@@ -146,6 +156,13 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
     };
 
     document.addEventListener("keydown", handleKeydown);
+    const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+    let buttonTags = ["Undo:[Ctrl+Z]", "Redo:[Ctrl+Y]", "Reset:[Ctrl+X]"];
+    for (let ind = 0; ind < 3; ind++){
+      if (buttons.length > ind && buttons[ind]) {
+        addCustomTooltip(buttons[ind], buttonTags[ind]);
+      }
+    }
     return () => {
       document.removeEventListener("keydown", handleKeydown);
     };

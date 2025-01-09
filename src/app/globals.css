@@ -98,6 +98,27 @@ body {
   padding: 0px !important;
 }
 
+button .custom-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.6); /* Black with transparency */
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 1000;
+  white-space: nowrap;
+  z-index: 1000;
+  transform: translate(-75%, 120%);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in 1s;
+}
+
+.button-with-tooltip:hover .custom-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
