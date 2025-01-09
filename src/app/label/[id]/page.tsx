@@ -58,6 +58,17 @@ const Label: React.FC = () => {
     <>
         <Header status='logged_in'/>
         <div className="bg-black min-h-[90vh]">
+          <LabelStudioUI />
+          <div className="flex items-center justify-center">
+            <Button 
+              variant="outline" 
+              className="mt-4 bg-gray-600 hover:bg-gray-700 text-white"
+              onClick={() => setRunTutorial(true)}
+            >
+              <HelpCircle className="w-4 h-4 mr-2" />
+              Help
+            </Button>
+          </div>
           <Joyride
             key={joyrideKey}
             steps={steps}
@@ -95,17 +106,6 @@ const Label: React.FC = () => {
             disableScrollParentFix={true}
             callback={handleJoyrideCallback}
           />
-          <LabelStudioUI />
-          <div className="flex items-center justify-center">
-            <Button 
-              variant="outline" 
-              className="mt-4 bg-gray-600 hover:bg-gray-700 text-white"
-              onClick={() => setRunTutorial(true)}
-            >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Help
-            </Button>
-          </div>
         </div>
     </>
     

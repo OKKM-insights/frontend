@@ -1,12 +1,6 @@
 import React, { useRef } from "react";
 import ProjectTile from "./ProjectTile";
-import { Project } from "@/types";
-
-interface ProjectSectionProps {
-  title: string;
-  projects: Project[];
-  color: string;
-}
+import { ProjectSectionProps } from "@/types";
 
 const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects, color }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);

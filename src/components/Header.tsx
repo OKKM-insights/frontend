@@ -5,10 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { LogOut, UserCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-
-interface HeaderProps {
-  status: "not_logged_in" | "logged_in";
-}
+import { HeaderProps } from '@/types';
 
 const Header: React.FC<HeaderProps> = ({status}) => {
   const router = useRouter();
@@ -23,6 +20,10 @@ const Header: React.FC<HeaderProps> = ({status}) => {
 
   const goToHome = () => {
     router.push('/');
+  };
+
+  const goToInfo = () => {
+    router.push('/information');
   };
 
   return (
@@ -45,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({status}) => {
             <div className="text-white mr-4">
               <span className="ml-1 font-semibold">$XXXX.XX</span>
             </div>
-            <Avatar className="cursor-pointer">
+            <Avatar onClick={goToInfo} className="cursor-pointer">
               <AvatarImage src="https://github.com/shadcn.png" alt="User" />
               <AvatarFallback>
                 <UserCircle className="w-6 h-6 text-gray-400" />
