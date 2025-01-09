@@ -44,33 +44,33 @@ export default function RegisterBox() {
         }} className="space-y-2">
             <div>
                 <Label htmlFor="labeler-email">Email</Label>
-                <Input id="labeler-email" type="email" className="bg-gray-700 text-white border-gray-600" />
+                <Input id="labeler-email" type="email" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
             </div>
             <div>
                 <Label htmlFor="labeler-password">Password</Label>
-                <Input id="labeler-password" type="password" className="bg-gray-700 text-white border-gray-600" />
+                <Input id="labeler-password" type="password" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
             </div>
             <div>
                 <Label htmlFor="labeler-confirm-password">Confirm Password</Label>
-                <Input id="labeler-confirm-password" type="password" className="bg-gray-700 text-white border-gray-600" />
+                <Input id="labeler-confirm-password" type="password" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
             </div>
             {loginType === 'labeler' ? (
                 <>
                     <div>
                         <Label htmlFor="full-name">First Name</Label>
-                        <Input id="full-name" className="bg-gray-700 text-white border-gray-600" />
+                        <Input id="full-name" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
                     </div>
                     <div>
                         <Label htmlFor="full-name">Last Name</Label>
-                        <Input id="full-name" className="bg-gray-700 text-white border-gray-600" />
+                        <Input id="full-name" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
                     </div>
                     <div>
                         <Label htmlFor="skills">Skills</Label>
-                        <Input id="skills" className="bg-gray-700 text-white border-gray-600" placeholder="e.g., Image Classification, Object Detection" />
+                        <Input id="skills" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" placeholder="e.g., Image Classification, Object Detection" />
                     </div>
                     <div>
                         <Label htmlFor="availability">Availability (hours per week)</Label>
-                        <Input id="availability" type="number" className="bg-gray-700 text-white border-gray-600" />
+                        <Input id="availability" type="number" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
                     </div>
                     <div  className="mt-6  text-center">
                         <Button type="submit" className="mt-4 w-3/4 bg-blue-600 hover:bg-blue-700 text-white ">
@@ -82,15 +82,15 @@ export default function RegisterBox() {
                 <>
                     <div>
                         <Label htmlFor="company-name">Company Name</Label>
-                        <Input id="company-name" className="bg-gray-700 text-white border-gray-600" />
+                        <Input id="company-name" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
                     </div>
                     <div>
                         <Label htmlFor="industry">Industry</Label>
-                        <Input id="industry" className="bg-gray-700 text-white border-gray-600" />
+                        <Input id="industry" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
                     </div>
                     <div>
                         <Label htmlFor="typical-proj">Typical Project Description</Label>
-                        <Textarea id="typical-proj" className="bg-gray-700 text-white border-gray-600" />
+                        <Textarea id="typical-proj" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" />
                     </div>
                     <div  className="mt-6  text-center">
                         <Button type="submit" className="mt-4 w-3/4 bg-blue-600 hover:bg-blue-700 text-white ">
@@ -105,7 +105,7 @@ export default function RegisterBox() {
             <p className="text-white">Already have an account? <span onClick={() => router.push("/login")} className="text-green-400 hover:text-green-500 cursor-pointer">Login</span></p>
         </div>
         {showSuccessPopup ?
-            <SuccessPopup />
+            <SuccessPopup message='Registration Successful' />
         : <></>}
     </div>
   )
