@@ -7,16 +7,16 @@ import Header from "@/components/Header";
 
 const ProjectHub: React.FC = () => {
   const projects: Project[] = [
-    { id: "1", title: "New Satellite Imagery", description: "Fresh data from EarthSat-3", status: "new" },
-    { id: "2", title: "Urban Development", description: "Tracking city growth", status: "current", progress: 60 },
-    { id: "3", title: "Forest Cover Analysis", description: "Annual deforestation report", status: "current", progress: 85 },
-    { id: "4", title: "Coastal Erosion Study", description: "5-year comparison", status: "finished" },
-    { id: "5", title: "Agricultural Yield Prediction", description: "Machine learning model training", status: "new" },
-    { id: "6", title: "Climate Change Impact", description: "Glacier retreat analysis", status: "finished" },
-    { id: "7", title: "Ocean Temperature Mapping", description: "Global warming effects on marine life", status: "new" },
-    { id: "8", title: "Desert Expansion Tracking", description: "Monitoring arid region growth", status: "current", progress: 40 },
-    { id: "9", title: "Urban Heat Island Effect", description: "Temperature variation in cities", status: "finished" },
-    { id: "10", title: "Polar Ice Cap Monitoring", description: "Annual ice coverage assessment", status: "current", progress: 75 },
+    { id: "1", title: "New Satellite Imagery", description: "Fresh data from EarthSat-3", status: "new" , type: 'client'},
+    { id: "2", title: "Urban Development", description: "Tracking city growth", status: "current", progress: 60, type: 'client' },
+    { id: "3", title: "Forest Cover Analysis", description: "Annual deforestation report", status: "current", progress: 85, type: 'client' },
+    { id: "4", title: "Coastal Erosion Study", description: "5-year comparison", status: "finished", type: 'client' },
+    { id: "5", title: "Agricultural Yield Prediction", description: "Machine learning model training", status: "new", type: 'client'},
+    { id: "6", title: "Climate Change Impact", description: "Glacier retreat analysis", status: "finished", type: 'client' },
+    { id: "7", title: "Ocean Temperature Mapping", description: "Global warming effects on marine life", status: "new", type: 'client' },
+    { id: "8", title: "Desert Expansion Tracking", description: "Monitoring arid region growth", status: "current", progress: 40, type: 'client'},
+    { id: "9", title: "Urban Heat Island Effect", description: "Temperature variation in cities", status: "finished", type: 'client'},
+    { id: "10", title: "Polar Ice Cap Monitoring", description: "Annual ice coverage assessment", status: "current", progress: 75, type: 'client'},
   ];
 
   return (

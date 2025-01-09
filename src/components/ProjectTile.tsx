@@ -1,17 +1,17 @@
 import React from 'react';
-import { Project } from '@/types';
+import { ProjectTileProps } from '@/types';
 import { useRouter } from 'next/navigation';
 import NewProjDialog from './NewProjDialog';
-
-interface ProjectTileProps {
-  project: Project;
-}
 
 const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
   const router = useRouter();
 
   const goToProject = () => {
-    router.push(`/label/${project.title}`);
+    if (project.type === "label"){
+      router.push(`/label/${project.title}`);
+    } else if (project.type === "client"){
+      router.push(`/project/${project.title}`);
+    }
   };
   return (
     <div className="w-80 bg-gray-800 text-white border border-white p-4 rounded-lg flex-shrink-0">
