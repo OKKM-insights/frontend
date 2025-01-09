@@ -113,6 +113,16 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
     return null; // If no annotation is selected
   };
 
+  const addCustomTooltip = (button, shortcut) => {
+    const tooltip = document.createElement('span');
+    tooltip.className = 'custom-tooltip';
+    tooltip.innerText = `${shortcut}`;
+  
+    button.classList.add('button-with-tooltip');
+    button.style.position = 'relative'; // Ensure proper positioning
+    button.appendChild(tooltip);
+  };
+
   // Add hotkey bindings
   useEffect(() => {
     const handleKeydown = (event) => {
@@ -124,9 +134,35 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
         const skipButton = document.querySelector("button.ls-skip-btn");
         if (skipButton) skipButton.click();
       }
+      if (event.ctrlKey && event.key === "z") {
+        const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+        if (buttons.length > 0 && buttons[0]) {
+          buttons[0].click();
+        }
+      }
+      if (event.ctrlKey && event.key === "y") {
+        const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+        if (buttons.length > 1 && buttons[1]) {
+          buttons[1].click();
+        }
+      }
+      if (event.ctrlKey && event.key === "x") {
+        const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+        if (buttons.length > 2 && buttons[2]) {
+          buttons[2].click();
+        }
+      }
+
     };
 
     document.addEventListener("keydown", handleKeydown);
+    const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+    let buttonTags = ["Undo:[Ctrl+Z]", "Redo:[Ctrl+Y]", "Reset:[Ctrl+X]"];
+    for (let ind = 0; ind < 3; ind++){
+      if (buttons.length > ind && buttons[ind]) {
+        addCustomTooltip(buttons[ind], buttonTags[ind]);
+      }
+    }
     return () => {
       document.removeEventListener("keydown", handleKeydown);
     };
