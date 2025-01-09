@@ -78,12 +78,10 @@ export default function UserInfo({ userType }: UserInfoProps) {
                 Back
             </Button>
             <CardTitle className="text-2xl font-bold">User Information</CardTitle>
-            {!isEditing && (
-                <Button variant="ghost" onClick={() => setIsEditing(true)} className="text-blue-400 hover:text-blue-300">
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-                </Button>
-            )}
+            <Button variant="ghost" onClick={() => setIsEditing(true)} className="text-blue-400 hover:text-blue-300" style={{ visibility: isEditing ? 'hidden' : 'visible' }}>
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
+            </Button>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center space-y-4">
