@@ -57,9 +57,6 @@ export default function NewProjDialog() {
       console.error(err)
       // do something on error
     });
-
-
-
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
