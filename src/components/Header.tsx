@@ -6,9 +6,11 @@ import { Button } from './ui/button';
 import { LogOut, UserCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { HeaderProps } from '@/types';
+import { useAuth } from "../context/AuthContext"
 
 const Header: React.FC<HeaderProps> = ({status}) => {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const goToLogin = () => {
     router.push('/login');
@@ -55,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({status}) => {
             <Button
               variant="ghost"
               className="text-white hover:text-green-400 flex items-center space-x-2"
-              onClick={goToHome}
+              onClick={logout}
             >
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
