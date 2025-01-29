@@ -31,7 +31,7 @@ const LabelHub: React.FC = () => {
       .then((response) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updatedProjects = response.data.projects.map((project: any) => ({
-          projectId: project.id,
+          id: project.id,
           title: project.title,
           description: project.description,
           status: "live",

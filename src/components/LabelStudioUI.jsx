@@ -1,41 +1,137 @@
 import { useEffect, useState, useRef } from 'react';
 import LabelStudio from "label-studio";
 import "label-studio/build/static/css/main.css";
+import axios from 'axios';
+import LoadingSpinner from './LoadingSpinner';
 
-const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-unused-vars
-  const [selected, setSelected] = useState(false);
-  const [currentTaskId, setCurrentTaskId] = useState(0); // Track the current task ID
+const LabelStudioUI = ({id, userId}) => {
+  const [labels, setLabels] = useState([]);
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [offset, setOffset] = useState(0);
   const labelStudioRef = useRef(null); // Store the LabelStudio instance
-  const images = [
-    `/images/airport_1.png`,
-    `/images/airport_2.png`,
-    `/images/airport_3.png`
-  ];
+  const limit = 5;
+
+  const fetchProjectDetails = async () => {
+    try {
+      //const url = `http://localhost:5050/api/project/${id}`
+      const url = `https://api.orbitwatch.xyz/api/project/${id}`
+      const response = await axios.get(url);
+      console.log(response.data)
+      const categoriesString = response.data.categories;
+      setLabels(categoriesString.split(',').map(category => category.trim()));
+      // Fetch images once the project details are available
+      await fetchImages();
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching project details:', error);
+      setError(error)
+      setLoading(false)
+    }
+  };
+
+  const fetchImages = async () => {
+    try {
+      //const url = `http://localhost:5050/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
+      const url = `https://api.orbitwatch.xyz/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
+      const response = await axios.get(url);
+      console.log(response.data.images)
+      setImages(prevImages => [...prevImages, ...response.data.images]);
+      setOffset(curr => curr + limit)
+    } catch (error) {
+      setError(error)
+      console.error("Error fetching images:", error);
+    }
+  };
+
+  const getCurrentTimestamp = () => {
+    const now = new Date();
+    const isoString = now.toISOString().replace("T", " ").replace("Z", "");
+    return isoString.slice(0, 23) + "00"; // Ensures 5-digit precision
+  };
+  
+
+  const handleSubmit = (labels, image, skip) => {
+    let labelData = [];
+    let time = getCurrentTimestamp();
+  
+    // Check if any label has the choice "Nothing to Label"
+    const nothingToLabel = labels.some(label => label.value?.choices && label.value.choices[0] === "Nothing to Label");
+  
+    if (nothingToLabel) {
+      labelData.push({
+        LabellerID: userId,
+        ImageID: image.id,
+        Class: "__nothing__",
+        bot_right_x: null,
+        bot_right_y: null,
+        top_left_x: null,
+        top_left_y: null,
+        offset_x: image.offset_x,
+        offset_y: image.offset_y,
+        creation_time: time,
+      });
+    } else if (skip){
+      labelData.push({
+        LabellerID: userId,
+        ImageID: image.id,
+        Class: "__skip__",
+        bot_right_x: null,
+        bot_right_y: null,
+        top_left_x: null,
+        top_left_y: null,
+        offset_x: image.offset_x,
+        offset_y: image.offset_y,
+        creation_time: time,
+      });
+    } else {
+      // Iterate through the labels and build the submission data
+      labelData = labels.map(label => {
+        // Construct the data object for each label with the relevant details
+        return {
+          LabellerID: userId,
+          ImageID: image.id,
+          Class: label.value.rectanglelabels[0],
+          bot_right_x: ((label.value?.x + label.value?.width) / 100)*image.image_width,
+          bot_right_y: ((label.value?.y + label.value?.height) / 100)*image.image_height,
+          top_left_x: (label.value?.x / 100)*image.image_width,
+          top_left_y: (label.value?.y / 100)*image.image_height,
+          offset_x: image.x_offset,
+          offset_y: image.y_offset,
+          creation_time: time,  // Example timestamp
+        };
+      });
+    }
+
+    console.log(labelData)
+
+    let url = "http://3.93.145.140/1.0/push_label";
+    // Send data via Axios
+    axios.post(url, { labels: labelData })
+      .then(response => {
+        console.log('Data submitted successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error submitting data:', error);
+      });
+  };
 
   // Function to initialize Label Studio
-  const initializeLabelStudio = (taskId) => {
+  const initializeLabelStudio = (image) => {
     labelStudioRef.current = new LabelStudio("label-studio", {
-      config: taskId%2 === 0 ?`
+      config:`
         <View>
-          <Header value="Label the Planes"
+          <Header value="Label the Following"
                 style="font-weight: normal"/>
           <RectangleLabels name="tag" toName="img" allowEmpty="false">
-              <Label value="Plane"/>
+              ${labels.map(label => `<Label value="${label}"/>`).join('')}
           </RectangleLabels>
           <Image name="img" value="$image"></Image>
           <Choices name="noLabelOption" toName="img">
               <Choice value="Nothing to Label" />
           </Choices>
         </View>
-      ` : `<View>
-            <Header value="Do you see a plane?"
-                style="font-weight: normal"/>
-            <Choices name="sentiment" toName="img" choice="single" showInLine="true">
-              <Choice value="Yes"/>
-              <Choice value="No"/>
-            </Choices>
-            <Image name="img" value="$image"></Image>
-          </View>
       `,
       interfaces: [
         "panel",
@@ -55,9 +151,8 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
       task: {
         annotations: [],
         predictions: [],
-        id: taskId + 1, // Pass current task ID
         data: {
-          image: images[taskId], // Use the current image based on task ID
+          image: `data:image/png;base64,${image.image}`,
         }
       },
 
@@ -71,47 +166,43 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
       },
 
       onSubmitAnnotation: function (LS, annotation) {// eslint-disable-line @typescript-eslint/no-unused-vars
+        // Dont allow submits on nothing
         console.log(annotation.serializeAnnotation());
-        setSelected(!selected);
-        getAnnotations();
-
-        // Move to the next task by updating task ID
-        const nextTaskId = (taskId + 1) % images.length; // Loop through tasks
-        setCurrentTaskId(nextTaskId);
+        let results = annotation.serializeAnnotation()
+        if (results.length !== 0){
+          handleImageProcessed();
+          handleSubmit(results, image, false)
+        }
+        
       },
 
       onSkipTask: function (LS) {// eslint-disable-line @typescript-eslint/no-unused-vars
-        console.log(`Task ${taskId + 1} skipped.`);
-        
-        // Move to the next task
-        const nextTaskId = (taskId + 1) % images.length;
-        setCurrentTaskId(nextTaskId);
+        handleImageProcessed();
+        handleSubmit([], image, true)
       },
-
-      // onEntityCreate: function (LS) {
-      //   console.log(`Task ${taskId + 1} created.`);
-      // }
     });
   };
 
-  // Reinitialize Label Studio when the task ID changes
-  useEffect(() => {
-    initializeLabelStudio(currentTaskId);
-  }, [currentTaskId]); // Dependency on task ID changes
-
-  // annotations can be accessed accordingly, so we can define our own buttons as we like
-  const getAnnotations = () => {
-    if (labelStudioRef.current) {
-      const annotationStore = labelStudioRef.current.annotationStore;
-      const selectedAnnotation = annotationStore.selected;
-      if (selectedAnnotation) {
-        const serializedAnnotation = selectedAnnotation.serializeAnnotation();
-        console.log("Another function: ", serializedAnnotation); // This will log the serialized annotation
-        return serializedAnnotation;
+  const handleImageProcessed = () => {
+    setImages(prevImages => {
+      const updatedImages = prevImages.slice(1); // Remove the first image
+      if (updatedImages.length <= 2) {
+        fetchImages();  // Fetch new images if 2 or less remain
       }
-    }
-    return null; // If no annotation is selected
+      return updatedImages;
+    });
   };
+
+  useEffect(() => {
+    if (images.length > 0) {
+      initializeLabelStudio(images[0]);  // Initialize with the first image in the array
+    }
+  }, [images]);  // Re-run when images change
+
+  // Fetch initial images when component mounts
+  useEffect(() => {
+    fetchProjectDetails();
+  }, []);
 
   const addCustomTooltip = (button, shortcut) => {
     const tooltip = document.createElement('span');
@@ -167,6 +258,22 @@ const LabelStudioUI = (props) => {// eslint-disable-line @typescript-eslint/no-u
       document.removeEventListener("keydown", handleKeydown);
     };
   }, []);
+
+  if (loading){
+    return <LoadingSpinner />
+  }
+
+  if (error) {
+    return <p>{error}</p>
+  }
+
+  if (images.length === 0){
+    return (
+        <p className="text-white text-center text-5xl font-bold p-6 rounded-lg shadow-lg">
+          Project Complete
+        </p>
+    )
+  }
 
   return (
     <div

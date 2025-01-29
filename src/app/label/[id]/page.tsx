@@ -79,7 +79,7 @@ const Label: React.FC = () => {
                 Back
             </Button>
           </div>
-          <LabelStudioUI />
+          <LabelStudioUI id={id} userId={user.id} /> 
           <div className="flex items-center justify-center">
             <Button 
               variant="outline" 
