@@ -24,14 +24,14 @@ const LabelHub: React.FC = () => {
   }, [user, router]);
   
   useEffect(() => {
-    //const url = 'http://localhost:5050/api/projects'
-    const url = 'https://api.orbitwatch.xyz/api/projects'
+    const url = 'http://localhost:5050/api/projects'
+    //const url = 'https://api.orbitwatch.xyz/api/projects'
     axios
       .get(url)
       .then((response) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updatedProjects = response.data.projects.map((project: any) => ({
-          projectId: project.id,
+          id: project.id,
           title: project.title,
           description: project.description,
           status: "live",

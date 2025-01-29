@@ -8,7 +8,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
 
   const goToProject = () => {
     if (project.type === "label"){
-      router.push(`/label/${project.title}`);
+      router.push(`/label/${project.id}`);
     } else if (project.type === "client"){
       router.push(`/project/${project.title}`);
     }
