@@ -6,34 +6,50 @@ import ProjectTile from '@/components/ProjectTile';
 import { Project } from '@/types';
 import Header from '@/components/Header';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
 const LabelHub: React.FC = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
       router.push('/');
     }
   }, [user, router]);
+  
+  useEffect(() => {
+    //const url = 'http://localhost:5050/api/projects'
+    const url = 'https://api.orbitwatch.xyz/api/projects'
+    axios
+      .get(url)
+      .then((response) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updatedProjects = response.data.projects.map((project: any) => ({
+          projectId: project.id,
+          title: project.title,
+          description: project.description,
+          status: "live",
+          type: "label",
+        }));
+        console.log(updatedProjects)
+        setProjects(updatedProjects);
+      })
+      .catch((error) => {
+        setError(error.response?.data?.error || "Failed to load projects");
+      });
+  }, []);
 
   if (!user) {
     return <LoadingSpinner />;
   }
-  const projects: Project[] = [
-    { id: '1', title: 'Tutorial', description: 'Fresh data from EarthSat-3', status: 'live', type: 'label'},
-    { id: '2', title: 'New Airport Imagery', description: 'Fresh data from EarthSat-3', status: 'live', type: 'label'},
-    { id: '3', title: 'Urban Development', description: 'Tracking city growth', status: 'inprogress', progress: 60, type: 'label' },
-    { id: '4', title: 'Coastal Erosion Study', description: '5-year comparison', status: 'live', type: 'label'},
-    { id: '5', title: 'Agricultural Yield Prediction', description: 'Machine learning model training', status: 'live', type: 'label'},
-    { id: '6', title: 'Climate Change Impact', description: 'Glacier retreat analysis', status: 'live', type: 'label'},
-    { id: '7', title: 'Ocean Temperature Mapping', description: 'Global warming effects on marine life', status: 'live', type: 'label'},
-    
-  ];
 
+  if (error) return <p>Error: {error}</p>;
   return (
     <>
         <Header status='logged_in'/>
