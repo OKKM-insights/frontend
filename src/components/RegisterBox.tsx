@@ -52,8 +52,8 @@ export default function RegisterBox() {
     }
 
     // send request to back end
-    const url = 'http://localhost:5050/api/register'
-    //const url = 'https://api.orbitwatch.xyz/api/register'
+    //const url = 'http://localhost:5050/api/register'
+    const url = 'https://api.orbitwatch.xyz/api/register'
     axios.post(url, formValues, {
       headers: {
         "Content-Type": "application/json",
