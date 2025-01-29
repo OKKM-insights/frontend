@@ -1,12 +1,15 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
 import Joyride, { Step, CallBackProps } from 'react-joyride';
 import { Button } from "@/components/ui/button";
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, ArrowLeft } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useRouter } from 'next/navigation'
+import { useAuth } from '../../../context/AuthContext';
 
 const LabelStudioUI = dynamic(() => import('../../../components/LabelStudioUI'), {
   ssr: false,
@@ -16,6 +19,18 @@ const Label: React.FC = () => {
   const { id } = useParams();
   const [runTutorial, setRunTutorial] = useState(id == "Tutorial");
   const [joyrideKey, setJoyrideKey] = useState(0);
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return <LoadingSpinner />;
+  }
 
 
   const handleJoyrideCallback = (data: CallBackProps) => {
@@ -58,6 +73,12 @@ const Label: React.FC = () => {
     <>
         <Header status='logged_in'/>
         <div className="bg-black min-h-[90vh]">
+          <div className="pl-4 pt-1">
+            <Button variant="ghost" className="text-white hover:text-black" onClick={() => {router.push('/label-projects')}}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+            </Button>
+          </div>
           <LabelStudioUI />
           <div className="flex items-center justify-center">
             <Button 

@@ -5,8 +5,24 @@ import ProjectSection from '@/components/ProjectSection';
 import ProjectTile from '@/components/ProjectTile';
 import { Project } from '@/types';
 import Header from '@/components/Header';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation'
+import { useAuth } from '../../context/AuthContext';
 
 const LabelHub: React.FC = () => {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return <LoadingSpinner />;
+  }
   const projects: Project[] = [
     { id: '1', title: 'Tutorial', description: 'Fresh data from EarthSat-3', status: 'live', type: 'label'},
     { id: '2', title: 'New Airport Imagery', description: 'Fresh data from EarthSat-3', status: 'live', type: 'label'},

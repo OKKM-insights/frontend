@@ -10,10 +10,24 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { Download } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useEffect } from 'react';
+import { useAuth } from '../../../context/AuthContext';
 
 
 const ProjectInsights: React.FC = () => {
     const router = useRouter();
+    const { user } = useAuth();
+
+    useEffect(() => {
+    if (!(user?.user_type === "client")) {
+        router.push('/');
+    }
+    }, [user, router]);
+
+    if (!user) {
+    return <LoadingSpinner />;
+    }
     const progressData = {
         completionPercentage: 100,
         labeledPhotos: 6500,

@@ -4,6 +4,10 @@ import React from "react";
 import ProjectSection from "@/components/ProjectSection";
 import { Project } from "@/types";
 import Header from "@/components/Header";
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation'
+import { useAuth } from '../../context/AuthContext';
 
 const ProjectHub: React.FC = () => {
   const projects: Project[] = [
@@ -18,6 +22,18 @@ const ProjectHub: React.FC = () => {
     { id: "9", title: "Urban Heat Island Effect", description: "Temperature variation in cities", status: "finished", type: 'client'},
     { id: "10", title: "Polar Ice Cap Monitoring", description: "Annual ice coverage assessment", status: "current", progress: 75, type: 'client'},
   ];
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!(user?.user_type === "client")) {
+      router.push('/');
+    }
+  }, [user, router]);
+
+  if (!user) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
