@@ -15,8 +15,8 @@ const LabelStudioUI = ({id, userId}) => {
 
   const fetchProjectDetails = async () => {
     try {
-      const url = `http://localhost:5050/api/project/${id}`
-      //const url = `https://api.orbitwatch.xyz/api/project/${id}`
+      //const url = `http://localhost:5050/api/project/${id}`
+      const url = `https://api.orbitwatch.xyz/api/project/${id}`
       const response = await axios.get(url);
       console.log(response.data)
       const categoriesString = response.data.categories;
@@ -33,8 +33,8 @@ const LabelStudioUI = ({id, userId}) => {
 
   const fetchImages = async () => {
     try {
-      const url = `http://localhost:5050/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
-      //const url = `https://api.orbitwatch.xyz/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
+      //const url = `http://localhost:5050/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
+      const url = `https://api.orbitwatch.xyz/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
       const response = await axios.get(url);
       console.log(response.data.images)
       setImages(prevImages => [...prevImages, ...response.data.images]);

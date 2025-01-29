@@ -50,8 +50,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = (email: string, password: string, userType: "labeller" | "client") => {
-    const url = "http://localhost:5050/api/login"
-    //const url = "https://api.orbitwatch.xyz/api/login"
+    //const url = "http://localhost:5050/api/login"
+    const url = "https://api.orbitwatch.xyz/api/login"
     return axios
       .post(url, { email, password, userType })
       .then((response) => {

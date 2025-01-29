@@ -24,8 +24,8 @@ const LabelHub: React.FC = () => {
   }, [user, router]);
   
   useEffect(() => {
-    const url = 'http://localhost:5050/api/projects'
-    //const url = 'https://api.orbitwatch.xyz/api/projects'
+    //const url = 'http://localhost:5050/api/projects'
+    const url = 'https://api.orbitwatch.xyz/api/projects'
     axios
       .get(url)
       .then((response) => {
