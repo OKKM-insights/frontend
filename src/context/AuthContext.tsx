@@ -4,25 +4,37 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import axios from "axios";
 
-interface User {
+interface Labeller {
     id: number;
     email: string;
     profilePicture: string;
-    userType: "labeller" | "client"
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
+    first_name: string;
+    last_name: string;
+    skills: string;
+    availability: number;
+    user_type: "labeller";
+}
+
+interface Client {
+  id: number;
+  email: string;
+  profilePicture: string;
+  name: string;
+  industry: string;
+  typical_proj: string;
+  user_type: "client";
 }
 
 interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  user: Labeller | Client | null;
+  login: (email: string, password: string, userType: "labeller" | "client") => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Labeller | Client | null>(null);
   // const [token, setToken] = useState<string | null>(null); leave out tokens for now
   const router = useRouter();
 
@@ -37,19 +49,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (email: string, password: string) => {
+  const login = (email: string, password: string, userType: "labeller" | "client") => {
     //const url = "http://localhost:5050/api/login"
     const url = "https://api.orbitwatch.xyz/api/login"
     return axios
-      .post(url, { email, password })
+      .post(url, { email, password, userType })
       .then((response) => {
         const data = response.data;
         console.log(data)
+        data.user["user_type"] = userType
         setUser(data.user);
         //setToken(data.token);
-        if (data?.user?.user_type === "client"){
+        if (userType === "client"){
             router.push("/projects")
-        } else if (data?.user?.user_type === "labeller") {
+        } else if (userType === "labeller") {
             router.push("/label-projects")
         }
       })
