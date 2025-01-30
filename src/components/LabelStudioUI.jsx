@@ -106,7 +106,8 @@ const LabelStudioUI = ({id, userId}) => {
 
     console.log(labelData)
 
-    let url = "http://3.93.145.140/1.0/push_label";
+    // let url = "http://3.93.145.140/1.0/push_label";
+    let url = "http://label.orbitwatch.xyz/1.0/push_label";
     // Send data via Axios
     axios.post(url, { labels: labelData })
       .then(response => {
