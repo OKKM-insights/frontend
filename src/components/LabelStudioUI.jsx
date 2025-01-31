@@ -68,8 +68,8 @@ const LabelStudioUI = ({id, userId}) => {
         bot_right_y: null,
         top_left_x: null,
         top_left_y: null,
-        offset_x: image.offset_x,
-        offset_y: image.offset_y,
+        offset_x: image.x_offset,
+        offset_y: image.y_offset,
         creation_time: time,
       });
     } else if (skip){
@@ -81,8 +81,8 @@ const LabelStudioUI = ({id, userId}) => {
         bot_right_y: null,
         top_left_x: null,
         top_left_y: null,
-        offset_x: image.offset_x,
-        offset_y: image.offset_y,
+        offset_x: image.x_offset,
+        offset_y: image.y_offset,
         creation_time: time,
       });
     } else {
