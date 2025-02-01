@@ -24,8 +24,8 @@ const LabelHub: React.FC = () => {
   }, [user, router]);
   
   useEffect(() => {
-    //const url = 'http://localhost:5050/api/projects'
-    const url = 'https://api.orbitwatch.xyz/api/projects'
+    //const url = `http://localhost:5050/api/projects?userId=${user?.id}`
+    const url = `https://api.orbitwatch.xyz/api/projects?userId=${user?.id}`
     axios
       .get(url)
       .then((response) => {
@@ -34,7 +34,8 @@ const LabelHub: React.FC = () => {
           id: project.id,
           title: project.title,
           description: project.description,
-          status: "live",
+          progress: parseInt(project.progress),
+          status: parseInt(project.progress) === 0 ? "live" : "inprogress",
           type: "label",
         }));
         console.log(updatedProjects)
