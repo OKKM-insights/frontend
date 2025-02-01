@@ -10,7 +10,7 @@ const LabelStudioUI = ({id, userId}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [offset, setOffset] = useState(0);
-  const labelStudioRef = useRef(null); // Store the LabelStudio instance
+  const labelStudioRef = useRef(null);
   const limit = 5;
 
   const fetchProjectDetails = async () => {
@@ -33,8 +33,8 @@ const LabelStudioUI = ({id, userId}) => {
 
   const fetchImages = async () => {
     try {
-      //const url = `http://localhost:5050/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
-      const url = `https://api.orbitwatch.xyz/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}`
+      //const url = `http://localhost:5050/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}&userId=${userId}`
+      const url = `https://api.orbitwatch.xyz/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}&userId=${userId}`
       const response = await axios.get(url);
       console.log(response.data.images)
       setImages(prevImages => [...prevImages, ...response.data.images]);
@@ -48,7 +48,7 @@ const LabelStudioUI = ({id, userId}) => {
   const getCurrentTimestamp = () => {
     const now = new Date();
     const isoString = now.toISOString().replace("T", " ").replace("Z", "");
-    return isoString.slice(0, 23) + "00"; // Ensures 5-digit precision
+    return isoString.slice(0, 23) + "00";
   };
   
 
@@ -63,6 +63,7 @@ const LabelStudioUI = ({id, userId}) => {
       labelData.push({
         LabellerID: userId,
         ImageID: image.id,
+        OrigImageID: image.orig_image_id,
         Class: "__nothing__",
         bot_right_x: null,
         bot_right_y: null,
@@ -76,6 +77,7 @@ const LabelStudioUI = ({id, userId}) => {
       labelData.push({
         LabellerID: userId,
         ImageID: image.id,
+        OrigImageID: image.orig_image_id,
         Class: "__skip__",
         bot_right_x: null,
         bot_right_y: null,
@@ -86,12 +88,11 @@ const LabelStudioUI = ({id, userId}) => {
         creation_time: time,
       });
     } else {
-      // Iterate through the labels and build the submission data
       labelData = labels.map(label => {
-        // Construct the data object for each label with the relevant details
         return {
           LabellerID: userId,
           ImageID: image.id,
+          OrigImageID: image.orig_image_id,
           Class: label.value.rectanglelabels[0],
           bot_right_x: ((label.value?.x + label.value?.width) / 100)*image.image_width,
           bot_right_y: ((label.value?.y + label.value?.height) / 100)*image.image_height,
@@ -99,7 +100,7 @@ const LabelStudioUI = ({id, userId}) => {
           top_left_y: (label.value?.y / 100)*image.image_height,
           offset_x: image.x_offset,
           offset_y: image.y_offset,
-          creation_time: time,  // Example timestamp
+          creation_time: time,
         };
       });
     }
@@ -108,7 +109,6 @@ const LabelStudioUI = ({id, userId}) => {
 
     // let url = "http://3.93.145.140/1.0/push_label";
     let url = "https://label.orbitwatch.xyz/1.0/push_label";
-    // Send data via Axios
     axios.post(url, { labels: labelData })
       .then(response => {
         console.log('Data submitted successfully:', response.data);
