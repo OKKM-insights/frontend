@@ -25,7 +25,7 @@ const InfoPage: React.FC = () => {
     <>
         <Header status='logged_in' />
         <div className="flex items-center justify-center mx-auto p-8 bg-black min-h-[90vh]">
-            <UserInfo userType='labeler' />
+            <UserInfo userType={user.userType} />
         </div>
     </>
     

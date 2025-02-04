@@ -26,7 +26,7 @@ const ProjectHub: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!(user?.user_type === "client")) {
+    if (!(user?.userType === "client")) {
       router.push('/');
     }
   }, [user, router]);
