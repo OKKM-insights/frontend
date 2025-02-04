@@ -45,4 +45,23 @@ export interface WorkPerformanceProps {
     totalLabelers: number;
     topPerformers: Array<Person>;
 }
+export interface Labeller {
+  id: number;
+  email: string;
+  profilePicture: string;
+  firstName: string;
+  lastName: string;
+  skills: string;
+  availability: number;
+  userType: "labeller";
+}
+export interface Client {
+  id: number;
+  email: string;
+  profilePicture: string;
+  name: string;
+  industry: string;
+  typicalProj: string;
+  userType: "client";
+}
 
