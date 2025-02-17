@@ -3,30 +3,11 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import axios from "axios";
-
-interface Labeller {
-    id: number;
-    email: string;
-    profilePicture: string;
-    first_name: string;
-    last_name: string;
-    skills: string;
-    availability: number;
-    user_type: "labeller";
-}
-
-interface Client {
-  id: number;
-  email: string;
-  profilePicture: string;
-  name: string;
-  industry: string;
-  typical_proj: string;
-  user_type: "client";
-}
+import { Labeller, Client } from "@/types";
 
 interface AuthContextType {
   user: Labeller | Client | null;
+  setUser: (user: Labeller | Client | null) => void;
   login: (email: string, password: string, userType: "labeller" | "client") => Promise<void>;
   logout: () => void;
 }
@@ -57,8 +38,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .then((response) => {
         const data = response.data;
         console.log(data)
-        data.user["user_type"] = userType
+        data.user["userType"] = userType
         setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
         //setToken(data.token);
         if (userType === "client"){
             router.push("/projects")
@@ -86,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -6,27 +6,22 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { UserCircle, Upload, Edit, ArrowLeft } from 'lucide-react'
-import { useRouter } from 'next/navigation';
-
+import { useRouter } from 'next/navigation'
+import { Client, Labeller } from '@/types'
+import axios from 'axios'
+import { useAuth } from '@/context/AuthContext'
 
 
 interface UserInfoProps {
-    userType: 'labeler' | 'client';
+    userType: 'labeller' | 'client';
 }
 
-export default function UserInfo({ userType }: UserInfoProps) {
-  const [profilePicture, setProfilePicture] = useState<string | null>(null)
+export default function UserInfo({ userType}: UserInfoProps) {
+  const { user, setUser } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState({
-    email: 'user@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    skills: 'Image Classification, Object Detection',
-    availability: '40',
-    companyName: 'Acme Inc.',
-    industry: 'Technology',
-    projectDescription: 'AI-powered image analysis for environmental monitoring.'
-  })
+  const formRef = useRef<HTMLFormElement>(null)
+  const [profilePicture, setProfilePicture] = useState<string>(`data:image/png;base64,${user?.profilePicture}`)
+  const [dupEmail, setDupEmail] = useState("")
 
   const router = useRouter();
 
@@ -41,32 +36,63 @@ export default function UserInfo({ userType }: UserInfoProps) {
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value
-    })
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Here you would typically send the updated data to your backend
-    console.log('Updated data:', formData)
-    setIsEditing(false)
-  }
+    const form = e.currentTarget as HTMLFormElement
+    const formData = new FormData(form)
+    const formValues = Object.fromEntries(formData.entries())
+    let updatedUser = null
+    if (user?.userType === "labeller"){
+      updatedUser = {
+        ...user,
+        profilePicture: profilePicture.replace(/^data:image\/[a-zA-Z]+;base64,/, ""),
+        email: formValues.email,
+        firstName: formValues.firstName,
+        lastName: formValues.lastName,
+        skills: formValues.skills,
+        availability: parseInt(String(formValues.availability))
+      }
+    } else if (user?.userType === "client"){
+      updatedUser = {
+        ...user,
+        profilePicture: profilePicture.replace(/^data:image\/[a-zA-Z]+;base64,/, ""),
+        email: formValues.email,
+        name: formValues.name,
+        industry: formValues.industry,
+        typicalProj: formValues.typicalProj,
+      }
+    }
+
+    console.log(updatedUser)
+
+    //const url = `http://localhost:5050/api/update-user/${user?.id}`
+    const url = `https://api.orbitwatch.xyz/api/update-user/${user?.id}`
+    axios.put(url, updatedUser, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(response => {
+      if (response.status === 200) {
+        if (user?.userType === "labeller"){
+          setUser(updatedUser as Labeller)
+        } else if (user?.userType === "client"){
+          setUser(updatedUser as Client)
+        }
+        setIsEditing(false)
+      } else {
+        console.error("Failed to submit the form")
+      }
+    }).catch(err => {
+      console.error(err)
+      if (err.response.data.error.includes("Duplicate entry")){
+        setDupEmail("Account with this email already exists")
+      }
+    });
+  };
 
   const handleCancel = () => {
-    // Reset form data to original values
-    setFormData({
-      email: 'user@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
-      skills: 'Image Classification, Object Detection',
-      availability: '40',
-      companyName: 'Acme Inc.',
-      industry: 'Technology',
-      projectDescription: 'AI-powered image analysis for environmental monitoring.'
-    })
+    setProfilePicture(`data:image/png;base64,${user?.profilePicture}`)
+    formRef.current?.reset();
     setIsEditing(false)
   }
 
@@ -86,16 +112,10 @@ export default function UserInfo({ userType }: UserInfoProps) {
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="w-32 h-32">
-              {profilePicture ? (
                 <AvatarImage src={profilePicture} alt="Profile" />
-              ) : (
-                <>
-                    <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-                    <AvatarFallback>
-                    <UserCircle className="w-32 h-32 text-gray-400" />
-                    </AvatarFallback>
-                </>
-              )}
+                <AvatarFallback>
+                  <UserCircle className="w-32 h-32 text-gray-400" />
+                </AvatarFallback>
             </Avatar>
             {isEditing && (
               <div>
@@ -143,48 +163,53 @@ export default function UserInfo({ userType }: UserInfoProps) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
+                name="email"
                 className="bg-gray-700 text-white border-gray-600"
-                value={formData.email}
-                onChange={handleInputChange}
+                defaultValue={user?.email}
                 disabled={!isEditing}
+                required
               />
+              {dupEmail && (
+                  <p className="text-red-500 text-sm">{dupEmail}</p>)}
             </div>
 
-            {userType === 'labeler' ? (
+            {userType === 'labeller' ? (
               <>
                 <div>
                     <Label htmlFor="firstName">First Name</Label>
                     <Input
                         id="firstName"
+                        name="firstName"
                         className="bg-gray-700 text-white border-gray-600"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
+                        defaultValue={(user as Labeller).firstName}
                         disabled={!isEditing}
+                        required
                     />
-                    </div>
-                    <div>
+                </div>
+                <div>
                     <Label htmlFor="lastName">Last Name</Label>
                     <Input
                         id="lastName"
+                        name="lastName"
                         className="bg-gray-700 text-white border-gray-600"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
+                        defaultValue={(user as Labeller).lastName}
                         disabled={!isEditing}
+                        required
                     />
                 </div>
                 <div>
                   <Label htmlFor="skills">Skills (comma separated)</Label>
                   <Input
                     id="skills"
+                    name="skills"
                     className="bg-gray-700 text-white border-gray-600"
-                    value={formData.skills}
-                    onChange={handleInputChange}
+                    defaultValue={(user as Labeller).skills}
                     disabled={!isEditing}
                   />
                 </div>
@@ -192,10 +217,10 @@ export default function UserInfo({ userType }: UserInfoProps) {
                   <Label htmlFor="availability">Availability (hours per week)</Label>
                   <Input
                     id="availability"
+                    name="availability"
                     type="number"
                     className="bg-gray-700 text-white border-gray-600"
-                    value={formData.availability}
-                    onChange={handleInputChange}
+                    defaultValue={(user as Labeller).availability}
                     disabled={!isEditing}
                   />
                 </div>
@@ -206,29 +231,31 @@ export default function UserInfo({ userType }: UserInfoProps) {
                   <Label htmlFor="companyName">Company Name</Label>
                   <Input
                     id="companyName"
+                    name="companyName"
                     className="bg-gray-700 text-white border-gray-600"
-                    value={formData.companyName}
-                    onChange={handleInputChange}
+                    defaultValue={(user as Client).name}
                     disabled={!isEditing}
+                    required
                   />
                 </div>
                 <div>
                   <Label htmlFor="industry">Industry</Label>
                   <Input
                     id="industry"
+                    name="industry"
                     className="bg-gray-700 text-white border-gray-600"
-                    value={formData.industry}
-                    onChange={handleInputChange}
+                    defaultValue={(user as Client).industry}
                     disabled={!isEditing}
+                    required
                   />
                 </div>
                 <div>
                   <Label htmlFor="projectDescription">Typical Project Description</Label>
                   <Textarea
                     id="projectDescription"
+                    name="typicalProj"
                     className="bg-gray-700 text-white border-gray-600"
-                    value={formData.projectDescription}
-                    onChange={handleInputChange}
+                    defaultValue={(user as Client).typicalProj}
                     disabled={!isEditing}
                   />
                 </div>
