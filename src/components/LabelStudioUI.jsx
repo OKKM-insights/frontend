@@ -52,14 +52,11 @@ const LabelStudioUI = ({id, userId}) => {
   };
   
 
-  const handleSubmit = (labels, image, skip) => {
+  const handleSubmit = (labels, image, skip, nothing) => {
     let labelData = [];
     let time = getCurrentTimestamp();
   
-    // Check if any label has the choice "Nothing to Label"
-    const nothingToLabel = labels.some(label => label.value?.choices && label.value.choices[0] === "Nothing to Label");
-  
-    if (nothingToLabel) {
+    if (nothing) {
       labelData.push({
         LabellerID: userId,
         ImageID: image.id,
@@ -128,10 +125,10 @@ const LabelStudioUI = ({id, userId}) => {
           <RectangleLabels name="tag" toName="img" allowEmpty="false">
               ${labels.map(label => `<Label value="${label}"/>`).join('')}
           </RectangleLabels>
-          <Image name="img" value="$image"></Image>
-          <Choices name="noLabelOption" toName="img">
-              <Choice value="Nothing to Label" />
-          </Choices>
+          <Image horizontalAlignment="center" crosshair="true" brightnessControl="true" contrastControl="true" zoom="true" negativeZoom="true" zoomControl="true" name="img" value="$image"></Image>
+          <View style="width: 130px; cursor: pointer; margin: 0 auto;">
+            <Text name="Nothing to Label" value="Nothing to Label" />
+          </View>
         </View>
       `,
       interfaces: [
@@ -172,14 +169,14 @@ const LabelStudioUI = ({id, userId}) => {
         let results = annotation.serializeAnnotation()
         if (results.length !== 0){
           handleImageProcessed();
-          handleSubmit(results, image, false)
+          handleSubmit(results, image, false, false)
         }
         
       },
 
       onSkipTask: function (LS) {// eslint-disable-line @typescript-eslint/no-unused-vars
         handleImageProcessed();
-        handleSubmit([], image, true)
+        handleSubmit([], image, true, false)
       },
     });
   };
@@ -197,6 +194,21 @@ const LabelStudioUI = ({id, userId}) => {
   useEffect(() => {
     if (images.length > 0) {
       initializeLabelStudio(images[0]);  // Initialize with the first image in the array
+      const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
+      let buttonTags = ["Undo:[Ctrl+Z]", "Redo:[Ctrl+Y]", "Reset:[Ctrl+X]"];
+      for (let ind = 0; ind < 3; ind++){
+        if (buttons.length > ind && buttons[ind]) {
+          addCustomTooltip(buttons[ind], buttonTags[ind]);
+        }
+      }
+      const nothingBtn = document.querySelector('.Text_block__1VM-S');
+      if (nothingBtn) {
+        nothingBtn.onclick = () => {
+          handleSubmit([], images[0], false, true);
+          handleImageProcessed();
+        }
+      }
+      
     }
   }, [images]);  // Re-run when images change
 
@@ -246,15 +258,7 @@ const LabelStudioUI = ({id, userId}) => {
       }
 
     };
-
     document.addEventListener("keydown", handleKeydown);
-    const buttons = document.querySelectorAll('.Panel_block__controls__psq4W .ant-btn');
-    let buttonTags = ["Undo:[Ctrl+Z]", "Redo:[Ctrl+Y]", "Reset:[Ctrl+X]"];
-    for (let ind = 0; ind < 3; ind++){
-      if (buttons.length > ind && buttons[ind]) {
-        addCustomTooltip(buttons[ind], buttonTags[ind]);
-      }
-    }
     return () => {
       document.removeEventListener("keydown", handleKeydown);
     };

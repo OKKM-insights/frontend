@@ -59,11 +59,10 @@ const LoginBox: React.FC = () => {
             <Label htmlFor="clientEmail" className="mb-2 text-lg text-white text-left">Email</Label>
             <Input
               id="clientEmail"
-              type="email"
+              type="text"
               name='email'
               placeholder="Enter your email"
               className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              required
             />
           </div>
 
@@ -75,7 +74,6 @@ const LoginBox: React.FC = () => {
               name='password'
               placeholder="Enter your password"
               className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              required
             />
           </div>
 

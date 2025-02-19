@@ -19,14 +19,14 @@ const Label: React.FC = () => {
   const { id } = useParams();
   const [runTutorial, setRunTutorial] = useState(id == "Tutorial");
   const [joyrideKey, setJoyrideKey] = useState(0);
-  const { user } = useAuth();
+  const { user, loading} = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !(user?.userType === "labeller")) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, router, loading]);
 
   if (!user) {
     return <LoadingSpinner />;
@@ -54,8 +54,13 @@ const Label: React.FC = () => {
       disableBeacon: true,
     },
     {
-      target: '.ant-form-item-control-input-content',
-      content: 'When there is nothing to label, check this box',
+      target: '.ImageView_block__3BAO-',
+      content: 'Use these tools to assist you. You can also zoom in and out using CTRL+Scroll',
+      disableBeacon: true,
+    },
+    {
+      target: '.Text_block__1VM-S',
+      content: 'When there is nothing to label, click this button',
       disableBeacon: true,
     },
     {
