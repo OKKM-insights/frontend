@@ -12,16 +12,16 @@ import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
 const LabelHub: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !(user?.userType === "labeller")) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, router, loading]);
   
   useEffect(() => {
     //const url = `http://localhost:5050/api/projects?userId=${user?.id}`

@@ -8,18 +8,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useAuth } from '../context/AuthContext'
 import { SuccessPopup } from './SuccessPopup'
 import axios from "axios"
+import { Loader } from 'lucide-react'
 
 export default function NewProjDialog() {
-  const [imageSource, setImageSource] = useState<'upload' | 'request'>('upload')
-  const [open, setOpen] = useState(false)
-  const [projectNameError, setProjectNameError] = useState("")
-  const [projectDescError, setProjectDescError] = useState("")
-  const [projectCategoryError, setProjectCategoryError] = useState("")
+  const [imageSource, setImageSource] = useState<'upload' | 'request'>('upload');
+  const [open, setOpen] = useState(false);
+  const [projectNameError, setProjectNameError] = useState("");
+  const [projectDescError, setProjectDescError] = useState("");
+  const [projectCategoryError, setProjectCategoryError] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [projectError, setProjectError] = useState("")
+  const [projectError, setProjectError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
   const handleFormSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+    setLoading(true)
     e.preventDefault(); // Prevent form from auto-submitting
     const form = e.currentTarget as HTMLFormElement;
     const formData = new FormData(form);
@@ -64,9 +67,11 @@ export default function NewProjDialog() {
         console.error("Failed to submit the form")
         setProjectError("Project Creation Failed. Please Try Again")
       }
+      setLoading(false)
     }).catch(err => {
       console.error(err)
       setProjectError("Project Creation Failed. Please Try Again")
+      setLoading(false)
     });
   };
   return (
@@ -159,13 +164,18 @@ export default function NewProjDialog() {
               </div>
               <div className="border-t border-gray-600 pt-4">
                 <Label>Total Estimated Cost</Label>
-                <p className="text-lg font-semibold text-green-400">$XXX.XX</p>
+                <p className="text-lg font-semibold text-green-400">$232.34</p>
                 <p className="text-sm text-gray-400">Final cost may vary based on project complexity</p>
               </div>
               {projectError && (
                     <p className="text-red-500 text-sm">{projectError}</p>)}
               <div className="p-6 pt-2 border-t border-gray-700">
-                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">Create Project</Button>
+                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  {loading ? 
+                    <Loader />
+                    : "Create Project"
+                  }
+                </Button>
               </div>
             </form>
           </div>

@@ -8,14 +8,14 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../../context/AuthContext';
 
 const InfoPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, router, loading]);
 
   if (!user) {
     return <LoadingSpinner />;

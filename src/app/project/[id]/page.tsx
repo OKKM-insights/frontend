@@ -17,16 +17,16 @@ import { useAuth } from '../../../context/AuthContext';
 
 const ProjectInsights: React.FC = () => {
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
     useEffect(() => {
-    if (!(user?.userType === "client")) {
+    if (!loading && !(user?.userType === "client")) {
         router.push('/');
     }
-    }, [user, router]);
+    }, [user, router, loading]);
 
     if (!user) {
-    return <LoadingSpinner />;
+        return <LoadingSpinner />;
     }
     const progressData = {
         completionPercentage: 100,

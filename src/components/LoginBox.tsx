@@ -59,11 +59,10 @@ const LoginBox: React.FC = () => {
             <Label htmlFor="clientEmail" className="mb-2 text-lg text-white text-left">Email</Label>
             <Input
               id="clientEmail"
-              type="email"
+              type="text"
               name='email'
               placeholder="Enter your email"
               className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              required
             />
           </div>
 
@@ -75,7 +74,6 @@ const LoginBox: React.FC = () => {
               name='password'
               placeholder="Enter your password"
               className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500"
-              required
             />
           </div>
 
@@ -88,9 +86,9 @@ const LoginBox: React.FC = () => {
         </form>
 
         {/* Links */}
-        <div className="mt-4 text-center">
+        {/* <div className="mt-4 text-center">
           <span onClick={() => router.push("/forgot-password")} className="text-blue-400 hover:text-blue-500 cursor-pointer">Forgot password?</span>
-        </div>
+        </div> */}
         <div className="mt-2 text-center">
           <p className="text-white">Need an account? <span onClick={() => router.push("/register")} className="text-green-400 hover:text-green-500 cursor-pointer">Register here</span></p>
         </div>
