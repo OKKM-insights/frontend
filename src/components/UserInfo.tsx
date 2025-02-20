@@ -136,7 +136,7 @@ export default function UserInfo({ userType}: UserInfoProps) {
             )}
           </div>
 
-          {!isEditing && (
+          {/* {!isEditing && (
             <div className="text-center space-y-4">
                 {userType === "client" ? (
                     <div className="flex justify-center space-x-4">
@@ -161,7 +161,7 @@ export default function UserInfo({ userType}: UserInfoProps) {
                     </>
                 }
             </div>
-          )}
+          )} */}
 
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div>

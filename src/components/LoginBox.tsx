@@ -86,9 +86,9 @@ const LoginBox: React.FC = () => {
         </form>
 
         {/* Links */}
-        <div className="mt-4 text-center">
+        {/* <div className="mt-4 text-center">
           <span onClick={() => router.push("/forgot-password")} className="text-blue-400 hover:text-blue-500 cursor-pointer">Forgot password?</span>
-        </div>
+        </div> */}
         <div className="mt-2 text-center">
           <p className="text-white">Need an account? <span onClick={() => router.push("/register")} className="text-green-400 hover:text-green-500 cursor-pointer">Register here</span></p>
         </div>

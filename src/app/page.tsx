@@ -3,8 +3,10 @@
 import React from 'react';
 import Image from 'next/image';
 import Header from '@/components/Header';
+import { useRouter } from 'next/navigation';
 
 const Home: React.FC = () => {
+  const router = useRouter();
     return (
       <>
         <Header status='not_logged_in' />
@@ -26,10 +28,10 @@ const Home: React.FC = () => {
           </div>
           
           <div className="relative z-10 flex gap-4">
-            <button className="px-6 py-3 text-lg font-semibold text-white bg-green-600 rounded hover:bg-green-700">
+            <button className="px-6 py-3 text-lg font-semibold text-white bg-green-600 rounded hover:bg-green-700" onClick={() => router.push("/register")}>
               Get Started
             </button>
-            <button className="px-6 py-3 text-lg font-semibold text-white bg-blue-600 border border-blue-500 rounded hover:bg-blue-700">
+            <button className="px-6 py-3 text-lg font-semibold text-white bg-blue-600 border border-blue-500 rounded hover:bg-blue-700" onClick={() => router.push("/learn-more")}>
               Learn More
             </button>
           </div>
