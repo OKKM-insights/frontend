@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({status}) => {
             {/* <div className="text-white mr-4">
               <span className="ml-1 font-semibold">$XXXX.XX</span>
             </div> */}
-            <Avatar onClick={goToInfo} className="cursor-pointer">
+            <Avatar onClick={goToInfo} className="cursor-pointer" data-testid="user-avatar">
               <AvatarImage src={`data:image/png;base64,${user?.profilePicture}`} alt="User" />
               <AvatarFallback>
                 <UserCircle className="w-6 h-6 text-gray-400" />

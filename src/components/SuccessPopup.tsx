@@ -1,3 +1,4 @@
+import React from "react";
 import { Dialog } from "@/components/ui/dialog"
 import { CheckCircle } from 'lucide-react'
 
