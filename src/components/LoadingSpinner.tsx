@@ -12,7 +12,7 @@ export default function LoadingSpinner({ size = 'medium' }: LoadingSpinnerProps)
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" data-testid="loading-spinner">
       <div className={`animate-spin rounded-full border-t-4 border-white border-opacity-75 ${sizeClasses[size]}`}></div>
     </div>
   )

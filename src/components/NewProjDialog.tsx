@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -82,7 +82,7 @@ export default function NewProjDialog() {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white max-h-[90vh] p-0 flex flex-col">
           <DialogHeader className="p-6 pb-2">
-            <DialogTitle className="text-2xl font-bold text-white">Create New Project</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-white">New Project</DialogTitle>
           </DialogHeader>
           <div className="max-h-[calc(90vh-8rem)] overflow-y-auto p-6 pt-2 custom-scrollbar">
             <form className="space-y-4" onSubmit={handleFormSubmit}>
