@@ -1,7 +1,6 @@
 "use client"; // Required if using Next.js app router with interactivity
 
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+import React from 'react';
 import PhotoLabelingTool from './PhotoLabelingTool';
 
 const Home: React.FC = () => {
