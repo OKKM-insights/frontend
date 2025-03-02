@@ -1,12 +1,13 @@
 "use client"; // Required if using Next.js app router with interactivity
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import  fabric, { Canvas, FabricImage, FabricObject, FabricObjectProps, filters, ObjectEvents, Rect, SerializedObjectProps}  from "fabric";
+import  fabric, { Canvas, FabricImage, FabricObject, FabricObjectProps, filters, ObjectEvents, Point, Rect, SerializedObjectProps}  from "fabric";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Check, Contrast, EyeOff, SkipForward, Sun, ZoomIn, ZoomOut } from "lucide-react";
+import { Check, Contrast, EyeOff, Hand, Move, RotateCcw, SkipForward, Sun, Trash2, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 const labels = ["Person", "Car", "Tree", "Animal", "Building"];
 const labelColors: Record<string, string> = {
@@ -37,8 +38,12 @@ export default function PhotoLabelingTool({ imageUrl, onSubmit, onSkip }: PhotoL
   const [zoom, setZoom] = useState(1);
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
-  const [selectedLabel, setSelectedLabel] = useState("");
+  const [selectedLabel, setSelectedLabel] = useState(labels[0]);
   const boundingBoxesRef = useRef<BoundingBox[]>([]);
+  const [isPanning, setIsPanning] = useState(false);
+  const isDragging = useRef(false);
+  const lastPosX = useRef(0);
+  const lastPosY = useRef(0);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -47,8 +52,8 @@ export default function PhotoLabelingTool({ imageUrl, onSubmit, onSkip }: PhotoL
       selection: false,
     });
   
-    fabricCanvas.setWidth(600);
-    fabricCanvas.setHeight(400);
+    fabricCanvas.setWidth(300);
+    fabricCanvas.setHeight(300);
     setCanvas(fabricCanvas);
     const loadImage = async () => {
       try {
@@ -85,105 +90,147 @@ useEffect(() => {
   let startY = 0;
 
   const handleMouseDown = (event: { e: fabric.TPointerEvent; }) => {
-    if (!selectedLabel) return;
-    const pointer = canvas.getPointer(event.e);
-    const objects = canvas.getObjects();
+    if (isPanning){
+      isDragging.current = true;
+      const { x, y } = canvas.getPointer(event.e);
+      lastPosX.current = x;
+      lastPosY.current = y;
 
-    const clickedObject = objects.find(obj => {
-      if (obj instanceof Rect) {
-        const { left, top, width = 0, height = 0 } = obj;
-        return (
-          pointer.x >= left! &&
-          pointer.x <= left! + width &&
-          pointer.y >= top! &&
-          pointer.y <= top! + height
-        );
+      canvas.setCursor("grab");
+    } else {
+      if (!selectedLabel) return;
+      const pointer = canvas.getPointer(event.e);
+      const objects = canvas.getObjects();
+
+      const clickedObject = objects.find(obj => {
+        if (obj instanceof Rect) {
+          const { left, top, width = 0, height = 0 } = obj;
+          return (
+            pointer.x >= left! &&
+            pointer.x <= left! + width &&
+            pointer.y >= top! &&
+            pointer.y <= top! + height
+          );
+        }
+        return false;
+      });
+
+      if (clickedObject && clickedObject instanceof Rect) {
+        canvas.setActiveObject(clickedObject);
+        clickedObject.set({
+          borderColor: labelColors[selectedLabel] || "rgba(0,0,255,0.3)",
+          cornerColor: labelColors[selectedLabel] || "rgba(0,0,255,0.3)",
+          cornerSize: 10,
+        });
+        canvas.requestRenderAll();
+        isEditing = true;
+        return;
       }
-      return false;
-    });
 
-    if (clickedObject && clickedObject instanceof Rect) {
-      canvas.setActiveObject(clickedObject);
-      clickedObject.set({
-        borderColor: labelColors[selectedLabel] || "rgba(0,0,255,0.3)",
-        cornerColor: labelColors[selectedLabel] || "rgba(0,0,255,0.3)",
-        cornerSize: 10,
-      });
-      canvas.requestRenderAll();
-      isEditing = true;
-      return;
-    }
+      if (!isEditing) {
+        isDrawing = true;
+        startX = pointer.x;
+        startY = pointer.y;
 
-    if (!isEditing) {
-      isDrawing = true;
-      startX = pointer.x;
-      startY = pointer.y;
+        rect = new Rect({
+          left: startX,
+          top: startY,
+          width: 1,
+          height: 1,
+          fill: labelColors[selectedLabel] || "rgba(0,0,255,0.3)",
+          stroke: (labelColors[selectedLabel] || "rgba(0,0,255,0.3)").replace("0.3", "1"),
+          strokeWidth: 0,
+          selectable: false,
+          hasControls: false
+        });
 
-      rect = new Rect({
-        left: startX,
-        top: startY,
-        width: 1,
-        height: 1,
-        fill: labelColors[selectedLabel] || "rgba(0,0,255,0.3)",
-        stroke: (labelColors[selectedLabel] || "rgba(0,0,255,0.3)").replace("0.3", "1"),
-        strokeWidth: 0,
-        selectable: false,
-        hasControls: false
-      });
-
-      canvas.add(rect);
+        canvas.add(rect);
+      }
     }
   };
 
   const handleMouseMove = (event: { e: fabric.TPointerEvent; }) => {
-    if (!isDrawing || !rect || isEditing) return;
-    const pointer = canvas.getPointer(event.e);
-    const width = pointer.x - startX;
-    const height = pointer.y - startY;
+    if (isDragging.current && isPanning) {
+      const pointer = canvas.getPointer(event.e);
+      const dx = pointer.x - lastPosX.current;
+      const dy = pointer.y - lastPosY.current;
 
-    rect.set({ width: Math.abs(width), height: Math.abs(height) });
+      const zoom = canvas.getZoom();
+      console.log(zoom)
+      const scaleFactor = zoom > 1.6 ? 1.5 : 0.8;
+    
+      canvas.relativePan(new Point(dx*scaleFactor, dy*scaleFactor));
+    
+      lastPosX.current = pointer.x;
+      lastPosY.current = pointer.y;
+    } else {
+      if (!isDrawing || !rect || isEditing || isPanning || isDragging.current) return;
+      const pointer = canvas.getPointer(event.e);
+      const newWidth = pointer.x - startX;
+      const newHeight = pointer.y - startY;
+      rect.set({
+        left: newWidth < 0 ? pointer.x : startX,
+        top: newHeight < 0 ? pointer.y : startY,
+        width: Math.abs(newWidth),
+        height: Math.abs(newHeight),
+      });
 
-    if (width < 0) rect.set({ left: pointer.x });
-    if (height < 0) rect.set({ top: pointer.y });
-
-    canvas.requestRenderAll();
+      canvas.requestRenderAll();
+    }
   };
 
   const handleMouseUp = () => {
     console.log(boundingBoxesRef.current)
-    if (!rect || !isDrawing || isEditing) return;
+    if (isDragging.current) {
+      isDragging.current = false;
+      canvas.setCursor("default");
+    } else {
+      if (!rect || !isDrawing || isEditing) return;
 
-    const coords = rect.getCoords();
-    const width = rect.width ?? 0;
-    const height = rect.height ?? 0;
+      const coords = rect.getCoords();
+      const width = rect.width ?? 0;
+      const height = rect.height ?? 0;
 
-    if (!coords || width < 5 || height < 5 || width > canvas.width! || height > canvas.height!) {
-      canvas.remove(rect);
-      canvas.requestRenderAll();
+      if (!coords || width < 5 || height < 5) {
+        canvas.remove(rect);
+        canvas.requestRenderAll();
+        isDrawing = false;
+        rect = null;
+        return;
+      }
+
+      const left = rect.left;
+      const top = rect.top;
+      const right = left + width;
+      const bottom = top + height;
+
+      if (left < 0 || top < 0 || right > canvas.width! || bottom > canvas.height!) {
+        canvas.remove(rect);
+        canvas.requestRenderAll();
+        isDrawing = false;
+        rect = null;
+        return;
+      }
+
+      rect.set({
+        selectable: true,
+        hasControls: true,
+        cornerSize: 10,
+      });
+
+      const newBox: BoundingBox = {
+        x: left ?? 0,
+        y: top ?? 0,
+        w: width,
+        h: height,
+        label: selectedLabel,
+      };
+
+      boundingBoxesRef.current = [...boundingBoxesRef.current, newBox];
+
       isDrawing = false;
       rect = null;
-      return;
     }
-
-    rect.set({
-      selectable: true,
-      hasControls: true,
-      cornerSize: 10,
-    });
-
-    const [tl] = coords;
-    const newBox: BoundingBox = {
-      x: tl.x ?? 0,
-      y: tl.y ?? 0,
-      w: width,
-      h: height,
-      label: selectedLabel,
-    };
-
-    boundingBoxesRef.current = [...boundingBoxesRef.current, newBox];
-
-    isDrawing = false;
-    rect = null;
   };
 
   const handleSelectionCreated = (event: { selected: fabric.Rect<Partial<fabric.RectProps>, fabric.SerializedRectProps, fabric.ObjectEvents>[]; }) => {
@@ -201,6 +248,7 @@ useEffect(() => {
   };
 
   const handleObjectMoving = (event : { target: FabricObject<Partial<FabricObjectProps>, SerializedObjectProps, ObjectEvents>; }) => {
+    console.log("sdads")
     const movingRect = event.target as Rect;
     if (!movingRect) return;
 
@@ -277,7 +325,7 @@ useEffect(() => {
     canvas.off("object:modified", handleObjectModified);
     canvas.off("selection:cleared", handleSelectionCleared);
   };
-}, [canvas, selectedLabel]); // Keep canvas in dependencies
+}, [canvas, selectedLabel, isPanning]); // Keep canvas in dependencies
 
 
   const handleZoom = (value: number) => {
@@ -309,10 +357,68 @@ useEffect(() => {
   const handleLabelSelect = useCallback((label: string) => {
     setSelectedLabel((prev) => (prev === label ? prev : label));
   }, []);
+
+  const handleReset = () => {
+    if (!canvas) return;
+  
+    // Clear all objects from the canvas
+    canvas.getObjects().forEach((obj) => {
+      if (obj !== canvas.backgroundImage) {
+        canvas.remove(obj);
+      }
+    });
+  
+    // Clear the bounding box references
+    boundingBoxesRef.current = [];
+  
+    // Redraw the canvas
+    canvas.requestRenderAll();
+  };
+
+  const handleUndo = () => {
+    if (!canvas || boundingBoxesRef.current.length === 0) return;
+  
+    // Remove the last bounding box from the ref array
+    const lastBox = boundingBoxesRef.current.pop();
+  
+    // Find and remove the corresponding Fabric.js object from the canvas
+    const objects = canvas.getObjects();
+    const lastRect = objects.find(obj =>
+      obj instanceof Rect &&
+      obj.left === lastBox?.x &&
+      obj.top === lastBox?.y &&
+      obj.width === lastBox?.w &&
+      obj.height === lastBox?.h
+    );
+  
+    if (lastRect) {
+      canvas.remove(lastRect);
+      canvas.requestRenderAll();
+    }
+  };
+
+  const resetCanvas = () => {
+    if (!canvas) return;
+    setZoom(1);
+    setContrast(100);
+    setBrightness(100);
+    setIsPanning(false);
+    
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+  
+    const img = canvas.getObjects()[0];
+    if (img) {
+      canvas.centerObject(img);
+      img.setCoords();
+    }
+  
+    canvas.requestRenderAll();
+  };
+
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto bg-background rounded-lg shadow-sm border">
       <div className="space-y-2 text-center">
-        <h2 className="text-lg font-medium">Label Selection</h2>
+        <h2 className="text-lg font-medium">Label the Following</h2>
         <div className="flex flex-wrap gap-2 justify-center">
         {labels.map((label, index) => {
             const color = labelColors[label]
@@ -342,7 +448,7 @@ useEffect(() => {
           })}
         </div>
       </div>
-
+{/* 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <TooltipProvider>
           <div className="space-y-2">
@@ -400,6 +506,119 @@ useEffect(() => {
             </Tooltip>
           </div>
         </TooltipProvider>
+      </div> */}
+
+<div className="flex justify-center">
+        <div className="rounded-lg border bg-card p-2 inline-block">
+          <div className="flex items-center gap-2">
+            <TooltipProvider>
+              {/* Canvas Controls */}
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={() => handleZoom(Math.max(1, zoom - 0.1))}>
+                      <ZoomOut className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Zoom Out</TooltipContent>
+                </Tooltip>
+
+                <span className="w-10 text-center text-sm">{zoom.toFixed(1)}x</span>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={() => handleZoom(Math.min(3, zoom + 0.1))}>
+                      <ZoomIn className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Zoom In</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={isPanning ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => setIsPanning((prev) => !prev)}
+                    >
+                      {isPanning ? <Hand className="h-4 w-4" /> : <Move className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{isPanning ? "Disable Move Mode" : "Enable Move Mode"}</TooltipContent>
+                </Tooltip>
+              </div>
+
+              <Separator orientation="vertical" className="h-6 mx-1" />
+
+              {/* Image Adjustments */}
+              <div className="flex items-center gap-3">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1">
+                      <Sun className="h-4 w-4" />
+                      <Slider
+                        value={[brightness]}
+                        min={50}
+                        max={150}
+                        onValueChange={(val) => setBrightness(val[0])}
+                        className="w-20"
+                      />
+                      <span className="w-8 text-center text-sm">{brightness}%</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Adjust Image Brightness</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1">
+                      <Contrast className="h-4 w-4" />
+                      <Slider
+                        value={[contrast]}
+                        min={50}
+                        max={150}
+                        onValueChange={(val) => setContrast(val[0])}
+                        className="w-20"
+                      />
+                      <span className="w-8 text-center text-sm">{contrast}%</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Adjust Image Contrast</TooltipContent>
+                </Tooltip>
+              </div>
+
+              <Separator orientation="vertical" className="h-6 mx-1" />
+
+              {/* View/Tool Controls */}
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={resetCanvas}>
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Reset View (Zoom, Brightness, Contrast)</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={handleUndo}>
+                      <Undo2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Undo Last Action</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" onClick={handleReset}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Clear All Labels</TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-center">
@@ -423,7 +642,6 @@ useEffect(() => {
         <Button
           onClick={() => onSubmit(boundingBoxesRef.current)}
           className="flex items-center gap-2"
-          disabled={!boundingBoxesRef.current.length}
         >
           <Check className="w-4 h-4" />
           Submit Labels
