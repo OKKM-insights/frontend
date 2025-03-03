@@ -8,31 +8,25 @@ import { Check, Contrast, EyeOff, Hand, Move, RotateCcw, SkipForward, Sun, Trash
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { BoundingBox, Image } from "@/types";
 
-const labels = ["Person", "Car", "Tree", "Animal", "Building"];
-const labelColors: Record<string, string> = {
-  Person: "rgba(255, 0, 0, 0.3)", // Red
-  Car: "rgba(0, 255, 0, 0.3)", // Green
-  Tree: "rgba(0, 0, 255, 0.3)", // Blue
-  Animal: "rgba(255, 165, 0, 0.3)", // Orange
-  Building: "rgba(128, 0, 128, 0.3)", // Purple
-};
-
-type BoundingBox = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    label: string;
-  };
-  
 type PhotoLabelingToolProps = {
-    imageUrl: string;
-    onSubmit: (boundingBoxes: BoundingBox[]) => void;
-    onSkip: () => void;
+    labels: string[];
+    image: Image;
+    onSubmit: (labels : BoundingBox[], image: Image, skip : boolean, nothing : boolean) => void;
 };
 
-export default function PhotoLabelingTool({ imageUrl, onSubmit, onSkip }: PhotoLabelingToolProps) {
+const base64ToBlobUrl = (base64: string) => {
+  const byteCharacters = atob(base64.split(",")[1]);
+  const byteArrays = [];
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArrays.push(byteCharacters.charCodeAt(i));
+  }
+  const blob = new Blob([new Uint8Array(byteArrays)], { type: "image/png" });
+  return URL.createObjectURL(blob);
+};
+
+export default function PhotoLabelingTool({ labels, image, onSubmit }: PhotoLabelingToolProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -44,6 +38,15 @@ export default function PhotoLabelingTool({ imageUrl, onSubmit, onSkip }: PhotoL
   const isDragging = useRef(false);
   const lastPosX = useRef(0);
   const lastPosY = useRef(0);
+  
+  const generateLabelColors = (labels: string[]): Record<string, string> => {
+    return labels.reduce((acc, label, index) => {
+      const hue = (index * 360) / labels.length;
+      acc[label] = `hsla(${hue}, 80%, 65%, 0.3)`;
+      return acc;
+    }, {} as Record<string, string>);
+  };
+  const labelColors = generateLabelColors(labels);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -57,7 +60,8 @@ export default function PhotoLabelingTool({ imageUrl, onSubmit, onSkip }: PhotoL
     setCanvas(fabricCanvas);
     const loadImage = async () => {
       try {
-        const img = await FabricImage.fromURL(imageUrl, { crossOrigin: "anonymous" });
+        const blobUrl = base64ToBlobUrl(`data:image/png;base64,${image.image}`);
+        const img = await FabricImage.fromURL(blobUrl);
   
         img.set({
           selectable: false,
@@ -78,7 +82,7 @@ export default function PhotoLabelingTool({ imageUrl, onSubmit, onSkip }: PhotoL
     return () => {
       fabricCanvas.dispose();
     };
-  }, [imageUrl]);
+  }, [image]);
 
 useEffect(() => {
   if (!canvas) return;
@@ -219,8 +223,10 @@ useEffect(() => {
       });
 
       const newBox: BoundingBox = {
-        x: left ?? 0,
-        y: top ?? 0,
+        tlx: left ?? 0,
+        tly: top ?? 0,
+        brx: left + width,
+        bry: top + height,
         w: width,
         h: height,
         label: selectedLabel,
@@ -275,9 +281,9 @@ useEffect(() => {
     boundingBoxesRef.current = boundingBoxesRef.current.map((box) => {
       const isSameBox =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Math.abs(box.x - (modifiedRect as any).originalLeft) < 5 &&
+        Math.abs(box.tlx - (modifiedRect as any).originalLeft) < 5 &&
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Math.abs(box.y - (modifiedRect as any).originalTop) < 5 &&
+        Math.abs(box.tly - (modifiedRect as any).originalTop) < 5 &&
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Math.abs(box.w - (modifiedRect as any).originalWidth) < 5 &&
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -385,8 +391,8 @@ useEffect(() => {
     const objects = canvas.getObjects();
     const lastRect = objects.find(obj =>
       obj instanceof Rect &&
-      obj.left === lastBox?.x &&
-      obj.top === lastBox?.y &&
+      obj.left === lastBox?.tlx &&
+      obj.top === lastBox?.tly &&
       obj.width === lastBox?.w &&
       obj.height === lastBox?.h
     );
@@ -406,7 +412,7 @@ useEffect(() => {
     
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   
-    const img = canvas.getObjects()[0];
+    const img = canvas.backgroundImage;
     if (img) {
       canvas.centerObject(img);
       img.setCoords();
@@ -415,243 +421,237 @@ useEffect(() => {
     canvas.requestRenderAll();
   };
 
+   // Keyboard shortcuts handler
+   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return // Prevent interfering with input fields
+      }
+  
+      e.preventDefault()
+      const key = e.key.toLowerCase()
+  
+      const actions: Record<string, () => void> = {
+        "-": () => handleZoom(Math.max(1, zoom - 0.1)),
+        "_": () => handleZoom(Math.max(1, zoom - 0.1)),
+        "=": () => handleZoom(Math.min(3, zoom + 0.1)),
+        "+": () => handleZoom(Math.min(3, zoom + 0.1)),
+        "m": () => setIsPanning((prev) => !prev),
+        "r": resetCanvas,
+        "z": () => (e.ctrlKey || e.metaKey) && handleUndo(),
+        "delete": handleReset,
+        "backspace": handleReset,
+        "n": () => onSubmit([], image, false, true),
+        "enter": () => onSubmit(boundingBoxesRef.current, image, false, false),
+        "s": () => onSubmit([], image, false, true),
+      }
+  
+      if (actions[key]) {
+        actions[key]()
+        return
+      }
+  
+      // Handle number shortcuts for labels
+      if (key >= "1" && key <= "9") {
+        const labelIndex = Number.parseInt(key) - 1
+        if (labelIndex < labels.length) handleLabelSelect(labels[labelIndex])
+      }
+    }
+  
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [handleLabelSelect, handleReset, handleUndo, handleZoom, onSubmit, resetCanvas, zoom])
+
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto bg-background rounded-lg shadow-sm border">
-      <div className="space-y-2 text-center">
-        <h2 className="text-lg font-medium">Label the Following</h2>
-        <div className="flex flex-wrap gap-2 justify-center">
-        {labels.map((label, index) => {
-            const color = labelColors[label]
-            const isSelected = selectedLabel === label
+    <TooltipProvider>
+      <div className="p-6 space-y-6 max-w-3xl mx-auto bg-background rounded-lg shadow-sm border">
+        <div className="space-y-2 text-center">
+          <h2 className="text-xl font-bold">Label the Following Image</h2>
+          <div className="flex flex-wrap gap-2 justify-center label-options">
+          {labels.map((label, index) => {
+              const color = labelColors[label]
+              const isSelected = selectedLabel === label
 
-            return (
-              <Button
-                key={`${label}-${index}`}
-                variant="outline"
-                onClick={() => handleLabelSelect(label)}
-                className={cn(
-                  "flex items-center gap-1 border-2 transition-colors font-medium",
-                  "hover:text-foreground",
-                  isSelected ? "border-foreground" : "border-transparent",
-                )}
-                style={{
-                  backgroundColor: color,
-                  // Make the background more opaque when selected
-                  ...(isSelected && {
-                    backgroundColor: color.replace("0.3", "0.5"),
-                  }),
-                }}
-              >
-                {label}
-              </Button>
-            )
-          })}
+              return (
+                <Button
+                  key={`${label}-${index}`}
+                  variant="outline"
+                  onClick={() => handleLabelSelect(label)}
+                  className={cn(
+                    "flex items-center gap-1 border-2 transition-colors font-medium",
+                    "hover:text-foreground",
+                    isSelected ? "border-foreground" : "border-transparent",
+                  )}
+                  style={{
+                    backgroundColor: color,
+                    ...(isSelected && {
+                      backgroundColor: color.replace("0.3", "0.5"),
+                    }),
+                  }}
+                >
+                  {label}
+                  <span className="text-xs opacity-50">({index + 1})</span>
+                </Button>
+              )
+            })}
+          </div>
         </div>
-      </div>
-{/* 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <TooltipProvider>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium flex items-center gap-1">
-                <ZoomIn className="w-4 h-4" /> Zoom
-              </label>
-              <span className="text-sm text-muted-foreground">{zoom.toFixed(1)}x</span>
-            </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2">
-                  <ZoomOut className="w-4 h-4 text-muted-foreground" />
-                  <Slider value={[zoom]} min={1} max={3} step={0.1} onValueChange={(val) => handleZoom(val[0])} />
-                  <ZoomIn className="w-4 h-4 text-muted-foreground" />
+
+        <div className="flex justify-center labeling-toolbar">
+          <div className="rounded-lg border bg-card p-2 inline-block">
+            <div className="flex items-center gap-2">
+                {/* Canvas Controls */}
+                <div className="flex items-center gap-1 zoom-controls">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => handleZoom(Math.max(1, zoom - 0.1))}>
+                        <ZoomOut className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Zoom Out (Press -)</TooltipContent>
+                  </Tooltip>
+
+                  <span className="w-10 text-center text-sm">{zoom.toFixed(1)}x</span>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => handleZoom(Math.min(3, zoom + 0.1))}>
+                        <ZoomIn className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Zoom In (Press +)</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={isPanning ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setIsPanning((prev) => !prev)}
+                      >
+                        {isPanning ? <Hand className="h-4 w-4" /> : <Move className="h-4 w-4" />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{isPanning ? "Disable Move Mode" : "Enable Move Mode"} (Press M)</TooltipContent>
+                  </Tooltip>
                 </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Adjust zoom level</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium flex items-center gap-1">
-                <Sun className="w-4 h-4" /> Brightness
-              </label>
-              <span className="text-sm text-muted-foreground">{brightness}%</span>
+                <Separator orientation="vertical" className="h-6 mx-1" />
+
+                {/* Image Adjustments */}
+                <div className="flex items-center gap-3 adjust-tools">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1">
+                        <Sun className="h-4 w-4" />
+                        <Slider
+                          value={[brightness]}
+                          min={50}
+                          max={150}
+                          onValueChange={(val) => setBrightness(val[0])}
+                          className="w-20"
+                        />
+                        <span className="w-8 text-center text-sm">{brightness}%</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Adjust Image Brightness</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1">
+                        <Contrast className="h-4 w-4" />
+                        <Slider
+                          value={[contrast]}
+                          min={50}
+                          max={150}
+                          onValueChange={(val) => setContrast(val[0])}
+                          className="w-20"
+                        />
+                        <span className="w-8 text-center text-sm">{contrast}%</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Adjust Image Contrast</TooltipContent>
+                  </Tooltip>
+                </div>
+
+                <Separator orientation="vertical" className="h-6 mx-1" />
+
+                {/* View/Tool Controls */}
+                <div className="flex items-center gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" className="reset-view" onClick={resetCanvas}>
+                        <RotateCcw className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Reset View - Zoom, Brightness, Contrast (Press R)</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" className="undo-label" onClick={handleUndo}>
+                        <Undo2 className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Undo Last Action (Ctrl+Z)</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" className="reset-labels" onClick={handleReset}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Clear All Labels (Delete)</TooltipContent>
+                  </Tooltip>
+                </div>
             </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Slider value={[brightness]} min={50} max={150} onValueChange={(val) => setBrightness(val[0])} />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Adjust image brightness</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium flex items-center gap-1">
-                <Contrast className="w-4 h-4" /> Contrast
-              </label>
-              <span className="text-sm text-muted-foreground">{contrast}%</span>
-            </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Slider value={[contrast]} min={50} max={150} onValueChange={(val) => setContrast(val[0])} />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Adjust image contrast</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </TooltipProvider>
-      </div> */}
-
-<div className="flex justify-center">
-        <div className="rounded-lg border bg-card p-2 inline-block">
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              {/* Canvas Controls */}
-              <div className="flex items-center gap-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => handleZoom(Math.max(1, zoom - 0.1))}>
-                      <ZoomOut className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Zoom Out</TooltipContent>
-                </Tooltip>
-
-                <span className="w-10 text-center text-sm">{zoom.toFixed(1)}x</span>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => handleZoom(Math.min(3, zoom + 0.1))}>
-                      <ZoomIn className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Zoom In</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={isPanning ? "default" : "outline"}
-                      size="icon"
-                      onClick={() => setIsPanning((prev) => !prev)}
-                    >
-                      {isPanning ? <Hand className="h-4 w-4" /> : <Move className="h-4 w-4" />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{isPanning ? "Disable Move Mode" : "Enable Move Mode"}</TooltipContent>
-                </Tooltip>
-              </div>
-
-              <Separator orientation="vertical" className="h-6 mx-1" />
-
-              {/* Image Adjustments */}
-              <div className="flex items-center gap-3">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1">
-                      <Sun className="h-4 w-4" />
-                      <Slider
-                        value={[brightness]}
-                        min={50}
-                        max={150}
-                        onValueChange={(val) => setBrightness(val[0])}
-                        className="w-20"
-                      />
-                      <span className="w-8 text-center text-sm">{brightness}%</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>Adjust Image Brightness</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1">
-                      <Contrast className="h-4 w-4" />
-                      <Slider
-                        value={[contrast]}
-                        min={50}
-                        max={150}
-                        onValueChange={(val) => setContrast(val[0])}
-                        className="w-20"
-                      />
-                      <span className="w-8 text-center text-sm">{contrast}%</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>Adjust Image Contrast</TooltipContent>
-                </Tooltip>
-              </div>
-
-              <Separator orientation="vertical" className="h-6 mx-1" />
-
-              {/* View/Tool Controls */}
-              <div className="flex items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={resetCanvas}>
-                      <RotateCcw className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Reset View (Zoom, Brightness, Contrast)</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={handleUndo}>
-                      <Undo2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Undo Last Action</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={handleReset}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Clear All Labels</TooltipContent>
-                </Tooltip>
-              </div>
-            </TooltipProvider>
           </div>
         </div>
-      </div>
 
-      <div className="flex justify-center">
-        <div className="inline-block border border-muted overflow-hidden bg-muted/20">
-          <canvas
-            ref={canvasRef}
-            className="h-[400px] object-contain"
-            style={{
-              filter: `brightness(${brightness}%) contrast(${contrast}%)`,
-            }}
-          />
+        <div className="flex justify-center">
+          <div className="inline-block border border-muted overflow-hidden bg-muted/20">
+            <canvas
+              ref={canvasRef}
+              className="h-[400px] object-contain"
+              style={{
+                filter: `brightness(${brightness}%) contrast(${contrast}%)`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-center gap-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" onClick={() => onSubmit([], image, false, true)} className="flex items-center gap-2 no-labels">
+                  <EyeOff className="w-4 h-4" />
+                  Nothing to Label
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Submit with no labels (Press N)</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={() => onSubmit(boundingBoxesRef.current, image, false, false)} className="flex items-center gap-2 submit-labels">
+                  <Check className="w-4 h-4" />
+                  Submit Labels
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Submit current labels (Press Enter)</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="secondary" onClick={() => onSubmit([], image, false, true)} className="flex items-center gap-2 skip-image">
+                  <SkipForward className="w-4 h-4" />
+                  Skip Image
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Skip this image (Press S)</TooltipContent>
+            </Tooltip>
         </div>
       </div>
-
-      <div className="flex justify-center gap-3">
-        <Button variant="outline" onClick={() => onSubmit([])} className="flex items-center gap-2">
-          <EyeOff className="w-4 h-4" />
-          Nothing to Label
-        </Button>
-
-        <Button
-          onClick={() => onSubmit(boundingBoxesRef.current)}
-          className="flex items-center gap-2"
-        >
-          <Check className="w-4 h-4" />
-          Submit Labels
-        </Button>
-
-        <Button variant="secondary" onClick={onSkip} className="flex items-center gap-2">
-          <SkipForward className="w-4 h-4" />
-          Skip Image
-        </Button>
-      </div>
-    </div>
+    </TooltipProvider>
   );
 }

@@ -64,4 +64,23 @@ export interface Client {
   typicalProj: string;
   userType: "client";
 }
+export type BoundingBox = {
+  tlx: number;
+  tly: number;
+  brx: number;
+  bry: number;
+  w: number;
+  h: number;
+  label: string;
+};
 
+export type Image = {
+  id: number;
+  image: string;
+  image_height: number;
+  image_width: number;
+  orig_image_id: number;
+  project_id: number;
+  x_offset: number;
+  y_offset: number;
+}
