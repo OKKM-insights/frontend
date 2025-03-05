@@ -593,7 +593,7 @@ useEffect(() => {
                         <Undo2 className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Undo Last Action (Ctrl+Z)</TooltipContent>
+                    <TooltipContent>Undo Last Label (Ctrl+Z)</TooltipContent>
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
