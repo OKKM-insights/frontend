@@ -96,7 +96,7 @@ const Label: React.FC = () => {
 
   const handleSubmit = (labels : BoundingBox[], image: Image, skip : boolean, nothing : boolean) => {
     if (labels.length == 0 && !skip && !nothing){
-      alert("No Labels to Submit!");
+      alert("No Labels to Submit! Please Draw Labels on the Image below if applicable");
       return;
     }
     handleImageProcessed();
@@ -239,14 +239,14 @@ const Label: React.FC = () => {
               </p> : 
           <PhotoLabelingTool labels={labels} image={images[0]} onSubmit={handleSubmit} />}
           <div className="flex items-center justify-center">
-            <Button 
+          {images.length !== 0 ? <Button 
               variant="outline" 
               className="mt-4 bg-gray-600 hover:bg-gray-700 text-white"
               onClick={() => setRunTutorial(true)}
             >
               <HelpCircle className="w-4 h-4 mr-2" />
               Help
-            </Button>
+            </Button> : <></>}
           </div>
           <Joyride
             key={joyrideKey}
