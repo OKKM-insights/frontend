@@ -96,7 +96,8 @@ const Label: React.FC = () => {
 
   const handleSubmit = (labels : BoundingBox[], image: Image, skip : boolean, nothing : boolean) => {
     if (labels.length == 0 && !skip && !nothing){
-      alert("No Labels to Submit!")
+      alert("No Labels to Submit!");
+      return;
     }
     handleImageProcessed();
     let labelData = [];
