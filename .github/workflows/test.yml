@@ -7,10 +7,10 @@ jobs:
     steps:
       - name: Checkout latest code
         uses: actions/checkout@v2
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v2.1.2
+      - name: Use Node.js 20
+        uses: actions/setup-node@v3
         with:
-          node-version: 12.x
+          node-version: 20
       - name: Run npm install
         run: npm install
       - name: Run tests
