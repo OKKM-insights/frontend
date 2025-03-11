@@ -108,7 +108,7 @@ export default function RegisterBox() {
             </div>
             <div>
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" value={password} onChange={(e) => setPassword(e.target.value)} name='password' type="password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" required/>
+                <Input id="password" value={password} onChange={(e) => setPassword(e.target.value)} name='password' type="password" pattern='^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\d!@#$%^&*(),.?\":{}|<>]{8,}$' className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" required/>
             </div>
             <div className="space-y-2">
                 <ul className="space-y-1">
@@ -128,7 +128,7 @@ export default function RegisterBox() {
             </div>
             <div>
                 <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input id="confirm-password" name='confirm_password' type="password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" required/>
+                <Input id="confirm-password" name='confirm_password' type="password" pattern='^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\d!@#$%^&*(),.?\":{}|<>]{8,}$' className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:border-blue-500" required/>
                 {wrongPassError && (
                   <p className="text-red-500 text-sm">{wrongPassError}</p>)}
             </div>
