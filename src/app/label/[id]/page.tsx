@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../../../context/AuthContext';
 import axios from 'axios';
 import PhotoLabelingTool from '@/components/PhotoLabelingTool';
-import { BoundingBox, Image } from '@/types';
+import { BoundingBox, Image as ImageType } from '@/types';
 
 const Label: React.FC = () => {
   const { id } = useParams();
@@ -19,7 +19,7 @@ const Label: React.FC = () => {
   const [joyrideKey, setJoyrideKey] = useState(0);
   const { user, loading} = useAuth();
   const [labels, setLabels] = useState<string[]>([]);
-  const [images, setImages] = useState<Image[]>([]);
+  const [images, setImages] = useState<ImageType[]>([]);
   const [loadingProject, setLoadingProject] = useState(true);
   const [error, setError] = useState("");
   const [offset, setOffset] = useState(0);
@@ -94,7 +94,7 @@ const Label: React.FC = () => {
     });
   };
 
-  const handleSubmit = (labels : BoundingBox[], image: Image, skip : boolean, nothing : boolean) => {
+  const handleSubmit = (labels : BoundingBox[], image: ImageType, skip : boolean, nothing : boolean) => {
     if (labels.length == 0 && !skip && !nothing){
       alert("No Labels to Submit! Please Draw Labels on the Image below if applicable");
       return;
@@ -172,6 +172,22 @@ const Label: React.FC = () => {
   };
 
   const steps: Step[] = [
+    {
+      target: "body", // or null
+      content: (
+        <div className="w-full max-w-2xl mx-auto rounded-lg text-center">
+          <img
+            src="/images/OrbitWatchDemo.gif"
+            alt="Tutorial Introduction"
+            className="w-full max-w-lg rounded-lg"
+          />
+          <p className="mt-4">
+            {"Welcome to the tutorial! Here's a small demonstration before we start."}
+          </p>
+        </div>
+      ),
+      disableBeacon: true,
+    },
     {
       target: '.label-options',
       content: 'Choose a label choice, and draw your label on the image below.',
