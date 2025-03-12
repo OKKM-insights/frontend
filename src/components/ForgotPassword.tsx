@@ -19,7 +19,6 @@ export default function ForgotPassword() {
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // send a request to your backend to send the verification code
-    console.log('Sending verification code to:', email);
     setStep(2);
     setError('');
   }
@@ -42,7 +41,6 @@ export default function ForgotPassword() {
       return;
     }
     // send the new password to your backend
-    console.log('Resetting password for:', email);
     setError('');
     // Handle form submission logic here
 

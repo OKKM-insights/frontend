@@ -16,6 +16,7 @@ const LabelHub: React.FC = () => {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loadingProjects, setLoadingProjects] = useState<boolean>(true);
 
   useEffect(() => {
     if (!loading && !(user?.userType === "labeller")) {
@@ -24,29 +25,31 @@ const LabelHub: React.FC = () => {
   }, [user, router, loading]);
   
   useEffect(() => {
-    //const url = `http://localhost:5050/api/projects?userId=${user?.id}`
-    const url = `https://api.orbitwatch.xyz/api/projects?userId=${user?.id}`
-    axios
-      .get(url)
-      .then((response) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const updatedProjects = response.data.projects.map((project: any) => ({
-          id: project.id,
-          title: project.title,
-          description: project.description,
-          progress: parseInt(project.progress),
-          status: parseInt(project.progress) === 0 ? "live" : "inprogress",
-          type: "label",
-        }));
-        console.log(updatedProjects)
-        setProjects(updatedProjects);
-      })
-      .catch((error) => {
-        setError(error.response?.data?.error || "Failed to load projects");
-      });
-  }, []);
+    if (!loading) {
+      //const url = `http://localhost:5050/api/projects?userId=${user?.id}`
+      const url = `https://api.orbitwatch.xyz/api/projects?userId=${user?.id}`
+      axios
+        .get(url)
+        .then((response) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const updatedProjects = response.data.projects.map((project: any) => ({
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            progress: parseInt(project.progress),
+            status: parseInt(project.progress) === 0 ? "live" : "inprogress",
+            type: "label",
+          }));
+          setProjects(updatedProjects);
+          setLoadingProjects(false);
+        })
+        .catch((error) => {
+          setError(error.response?.data?.error || "Failed to load projects");
+        });
+    }
+  }, [loading]);
 
-  if (!user) {
+  if (!user || loadingProjects) {
     return <LoadingSpinner />;
   }
 

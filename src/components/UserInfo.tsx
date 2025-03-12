@@ -63,8 +63,6 @@ export default function UserInfo({ userType}: UserInfoProps) {
       }
     }
 
-    console.log(updatedUser)
-
     //const url = `http://localhost:5050/api/update-user/${user?.id}`
     const url = `https://api.orbitwatch.xyz/api/update-user/${user?.id}`
     axios.put(url, updatedUser, {
