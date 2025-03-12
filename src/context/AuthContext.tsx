@@ -36,7 +36,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .post(url, { email, password, userType })
       .then((response) => {
         const data = response.data;
-        console.log(data)
         data.user["userType"] = userType
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));

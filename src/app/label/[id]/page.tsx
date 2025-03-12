@@ -37,7 +37,6 @@ const Label: React.FC = () => {
       //const url = `http://localhost:5050/api/project/${id}`
       const url = `https://api.orbitwatch.xyz/api/project/${id}`
       const response = await axios.get(url);
-      console.log(response.data)
       const categoriesString = response.data.categories;
       setLabels(categoriesString.split(',').map((category: string) => category.trim()));
       // Fetch images once the project details are available
@@ -55,7 +54,6 @@ const Label: React.FC = () => {
       //const url = `http://localhost:5050/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}&userId=${userId}`
       const url = `https://api.orbitwatch.xyz/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}&userId=${user?.id}`
       const response = await axios.get(url);
-      console.log(response.data.images)
       setImages(prevImages => [...prevImages, ...response.data.images]);
       setOffset(curr => curr + limit)
     } catch (error) {

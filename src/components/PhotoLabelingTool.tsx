@@ -160,7 +160,6 @@ useEffect(() => {
       const dy = pointer.y - lastPosY.current;
 
       const zoom = canvas.getZoom();
-      console.log(zoom)
       const scaleFactor = zoom > 1.6 ? 1.5 : 0.8;
     
       canvas.relativePan(new Point(dx*scaleFactor, dy*scaleFactor));
@@ -184,7 +183,6 @@ useEffect(() => {
   };
 
   const handleMouseUp = () => {
-    console.log(boundingBoxesRef.current)
     if (isDragging.current) {
       isDragging.current = false;
       canvas.setCursor("default");
@@ -254,7 +252,6 @@ useEffect(() => {
   };
 
   const handleObjectMoving = (event : { target: FabricObject<Partial<FabricObjectProps>, SerializedObjectProps, ObjectEvents>; }) => {
-    console.log("sdads")
     const movingRect = event.target as Rect;
     if (!movingRect) return;
 
@@ -421,6 +418,24 @@ useEffect(() => {
     canvas.requestRenderAll();
   };
 
+  const skipImage = () => {
+    onSubmit([], image, true, false);
+    boundingBoxesRef.current = [];
+    resetCanvas();
+  }
+
+  const nothingToLabel = () => {
+    onSubmit([], image, false, true);
+    boundingBoxesRef.current = [];
+    resetCanvas();
+  }
+
+  const submitLabels = () => {
+    onSubmit(boundingBoxesRef.current, image, false, false);
+    boundingBoxesRef.current = [];
+    resetCanvas();
+  }
+
    // Keyboard shortcuts handler
    useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -441,9 +456,9 @@ useEffect(() => {
         "z": () => (e.ctrlKey || e.metaKey) && handleUndo(),
         "delete": handleReset,
         "backspace": handleReset,
-        "n": () => onSubmit([], image, false, true),
-        "enter": () => onSubmit(boundingBoxesRef.current, image, false, false),
-        "s": () => onSubmit([], image, false, true),
+        "n": () => nothingToLabel(),
+        "enter": ()=> submitLabels(),
+        "s": () => skipImage(),
       }
   
       if (actions[key]) {
@@ -623,7 +638,7 @@ useEffect(() => {
         <div className="flex justify-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" onClick={() => onSubmit([], image, false, true)} className="flex items-center gap-2 no-labels">
+                <Button variant="outline" onClick={() => nothingToLabel()} className="flex items-center gap-2 no-labels">
                   <EyeOff className="w-4 h-4" />
                   Nothing to Label
                 </Button>
@@ -633,7 +648,7 @@ useEffect(() => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={() => onSubmit(boundingBoxesRef.current, image, false, false)} className="flex items-center gap-2 submit-labels">
+                <Button onClick={() => submitLabels()} className="flex items-center gap-2 submit-labels">
                   <Check className="w-4 h-4" />
                   Submit Labels
                 </Button>
@@ -643,7 +658,7 @@ useEffect(() => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="secondary" onClick={() => onSubmit([], image, false, true)} className="flex items-center gap-2 skip-image">
+                <Button variant="secondary" onClick={() => skipImage()} className="flex items-center gap-2 skip-image">
                   <SkipForward className="w-4 h-4" />
                   Skip Image
                 </Button>

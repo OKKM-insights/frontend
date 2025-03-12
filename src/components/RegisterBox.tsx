@@ -42,8 +42,6 @@ export default function RegisterBox() {
     const formValues = Object.fromEntries(formData.entries())
     formValues["user_type"] = loginType
 
-    console.log(formValues)
-
     if (String(formValues["password"]) !== String(formValues["confirm_password"])){
       setWrongPassError("Does not match Password")
       return
