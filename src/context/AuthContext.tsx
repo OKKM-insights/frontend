@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const data = response.data;
         data.user["userType"] = userType
         setUser(data.user);
+        console.log(data.user)
         localStorage.setItem("user", JSON.stringify(data.user));
         if (userType === "client"){
             router.push("/projects")

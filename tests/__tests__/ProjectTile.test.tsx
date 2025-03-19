@@ -47,7 +47,7 @@ describe("ProjectTile Component", () => {
   test("navigates to client project when type is 'client'", () => {
     render(<ProjectTile project={{id: "123", description: "Project description",  title: "Client Project", type: "client", status: "live" }} />);
     fireEvent.click(screen.getByText("Start Labeling"));
-    expect(mockPush).toHaveBeenCalledWith("/project/Client Project");
+    expect(mockPush).toHaveBeenCalledWith("/project/123");
   });
 
   test("button text changes based on status", () => {

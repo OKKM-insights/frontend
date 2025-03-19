@@ -5,10 +5,30 @@ import { PieChart, Pie, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DataInsightsProps } from '@/types';
 
-export default function DataInsights({ categoryData }: DataInsightsProps) {
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PercentTooltipContent = ({ active, payload }: any) => {
+  console.log(payload)
+  if (active && payload && payload.length) {
     return (
-        <Card className="bg-gray-800 text-white h-fit">
+      <div className="rounded-lg border bg-background p-2 shadow-sm">
+        <div className="flex flex-col gap-0.5 text-center">
+          <span className="text-muted-foreground">{payload[0].name}</span>
+          <span className="font-bold text-black">{`${payload[0].value}%`}</span>
+        </div>
+      </div>
+    )
+  }
+  return null
+}
+
+export default function DataInsights({ categoryData , totalLabels }: DataInsightsProps) {
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+    const dataWithPercentage = categoryData.map(({name, value}) => ({
+      name,
+      value: Math.round(value/totalLabels * 100),
+    }))
+    return (
+        <Card className="col-span-2 bg-gray-800 text-white h-fit">
           <CardHeader>
             <CardTitle>Dataset Insights</CardTitle>
           </CardHeader>
@@ -29,7 +49,7 @@ export default function DataInsights({ categoryData }: DataInsightsProps) {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={categoryData}
+                        data={dataWithPercentage}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
@@ -41,7 +61,7 @@ export default function DataInsights({ categoryData }: DataInsightsProps) {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartTooltip content={<PercentTooltipContent />} />
                     </PieChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -60,11 +80,10 @@ export default function DataInsights({ categoryData }: DataInsightsProps) {
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={[
-                        { resolution: 'Low', count: 2000 },
-                        { resolution: 'Medium', count: 5000 },
-                        { resolution: 'High', count: 3000 },
-                      ]}
+                      data={categoryData.map(({name, value}) => ({
+                        resolution: name.charAt(0).toUpperCase() + name.slice(1),
+                        count: value,
+                      }))}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="resolution" />

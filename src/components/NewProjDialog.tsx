@@ -3,15 +3,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useAuth } from '../context/AuthContext'
 import { SuccessPopup } from './SuccessPopup'
 import axios from "axios"
 import { Loader } from 'lucide-react'
 
-export default function NewProjDialog() {
-  const [imageSource, setImageSource] = useState<'upload' | 'request'>('upload');
+export default function NewProjDialog({ triggerReload }: { triggerReload: () => void }) {
+  //const [imageSource, setImageSource] = useState<'upload' | 'request'>('upload');
   const [open, setOpen] = useState(false);
   const [projectNameError, setProjectNameError] = useState("");
   const [projectDescError, setProjectDescError] = useState("");
@@ -48,20 +47,17 @@ export default function NewProjDialog() {
       setProjectCategoryError("")
     }
 
-    console.log(formValues)
-    
-
     // // send request to back end
     //const url = "http://localhost:5050/api/create_project"
     const url = "https://api.orbitwatch.xyz/api/create_project"
     axios.post(url, formData).then(response => {
       if (response.status === 200) {
-        console.log("Form submitted successfully")
         // Do something on success, like showing a success message or resetting the form
         setOpen(false)
         setShowSuccessPopup(true);
         setTimeout(() => {
           setShowSuccessPopup(false);
+          triggerReload();
         }, 1500);
       } else {
         console.error("Failed to submit the form")
@@ -112,7 +108,7 @@ export default function NewProjDialog() {
                   required
                 />
               </div>
-              <div>
+              {/* <div>
                 <Label>Image Source</Label>
                 <RadioGroup defaultValue="upload" onValueChange={(value) => setImageSource(value as 'upload' | 'request')}>
                   <div className="flex items-center space-x-2">
@@ -124,8 +120,8 @@ export default function NewProjDialog() {
                     <Label htmlFor="request">Request Images</Label>
                   </div>
                 </RadioGroup>
-              </div>
-              {imageSource === 'upload' ? (
+              </div> */}
+              {/* {imageSource === 'upload' ? ( */}
                 <div>
                   <Label htmlFor="image-upload" className="block mb-2">Upload Images</Label>
                   <div>
@@ -140,22 +136,22 @@ export default function NewProjDialog() {
                     />
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" name='location' placeholder="e.g., New York City" className="bg-gray-700 text-white border-gray-600" required/>
-                  </div>
-                  <div>
-                    <Label htmlFor="radius">Radius (km)</Label>
-                    <Input id="radius" name='radius' type="number" placeholder="e.g., 10" className="bg-gray-700 text-white border-gray-600" required/>
-                  </div>
-                  <div>
-                    <Label htmlFor="timeframe">Timeframe</Label>
-                    <Input id="timeframe" name='timeframe' placeholder="e.g., Last 6 months" className="bg-gray-700 text-white border-gray-600" required/>
-                  </div>
-                </div>
-              )}
+              {/* // ) : (
+              //   <div className="space-y-2">
+              //     <div>
+              //       <Label htmlFor="location">Location</Label>
+              //       <Input id="location" name='location' placeholder="e.g., New York City" className="bg-gray-700 text-white border-gray-600" required/>
+              //     </div>
+              //     <div>
+              //       <Label htmlFor="radius">Radius (km)</Label>
+              //       <Input id="radius" name='radius' type="number" placeholder="e.g., 10" className="bg-gray-700 text-white border-gray-600" required/>
+              //     </div>
+              //     <div>
+              //       <Label htmlFor="timeframe">Timeframe</Label>
+              //       <Input id="timeframe" name='timeframe' placeholder="e.g., Last 6 months" className="bg-gray-700 text-white border-gray-600" required/>
+              //     </div>
+              //   </div>
+              // )} */}
               <div>
                 <Label htmlFor="analysis-goal">What are you looking to find in these images?</Label>
                 <Textarea id="analysis-goal" name='analysis-goal' className="bg-gray-700 text-white border-gray-600" placeholder='Enter values seperated by commas, e.g. dogs, cats, birds' maxLength={80} required/>

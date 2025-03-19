@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { ProgressDataProps } from '@/types';
 
-export default function ProgressData({completionPercentage, labeledPhotos, totalPhotos, timeRemaining} : ProgressDataProps) {
+export default function ProgressData({completionPercentage, recentActivity, timeRemaining} : ProgressDataProps) {
     
     return (
         <Card className="bg-gray-800 text-white h-full flex flex-col">
@@ -19,18 +19,14 @@ export default function ProgressData({completionPercentage, labeledPhotos, total
               </div>
               <div className="flex justify-between text-sm">
                 <div>
-                  <h3 className="font-semibold mb-1 text-white">Labeled Photos</h3>
-                  <p>{labeledPhotos} / {totalPhotos}</p>
+                  <h3 className="font-semibold mb-1 text-white">Recent Activity</h3>
+                  <p>Last Label: {recentActivity}</p>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1 text-white">Time Remaining</h3>
                   <p>{timeRemaining}</p>
                 </div>
               </div>
-            </div>
-            <div className="mt-6 pt-6 border-t border-gray-700">
-              <h3 className="text-sm font-semibold mb-2 text-white">Recent Activity</h3>
-              <p className="text-xs text-gray-400">Last update: 2 hours ago</p>
             </div>
           </CardContent>
         </Card>

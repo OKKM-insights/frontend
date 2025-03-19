@@ -17,7 +17,6 @@ const LoginBox: React.FC = () => {
     const form = e.currentTarget as HTMLFormElement
     const formData = new FormData(form)
     const formValues = Object.fromEntries(formData.entries())
-    console.log(formValues)
     setCredsError("");
 
     // Tell users when credentials are incorrect

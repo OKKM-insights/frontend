@@ -55,13 +55,14 @@ export default function PhotoLabelingTool({ labels, image, onSubmit }: PhotoLabe
       selection: false,
     });
   
-    fabricCanvas.setWidth(300);
-    fabricCanvas.setHeight(300);
     setCanvas(fabricCanvas);
     const loadImage = async () => {
       try {
         const blobUrl = base64ToBlobUrl(`data:image/png;base64,${image.image}`);
         const img = await FabricImage.fromURL(blobUrl);
+
+        fabricCanvas.setWidth(img.width!);
+        fabricCanvas.setHeight(img.height!);
   
         img.set({
           selectable: false,

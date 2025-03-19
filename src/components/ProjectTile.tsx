@@ -3,14 +3,14 @@ import { ProjectTileProps } from '@/types';
 import { useRouter } from 'next/navigation';
 import NewProjDialog from './NewProjDialog';
 
-const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
+const ProjectTile: React.FC<ProjectTileProps> = ({ triggerReload, project }) => {
   const router = useRouter();
 
   const goToProject = () => {
     if (project.type === "label"){
       router.push(`/label/${project.id}`);
     } else if (project.type === "client"){
-      router.push(`/project/${project.title}`);
+      router.push(`/project/${project.id}`);
     }
   };
   return (
@@ -32,7 +32,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
           </div>
         )}
         {project.status === "new" ? 
-          <NewProjDialog />
+          <NewProjDialog triggerReload={triggerReload ?? (() => {})} />
           : 
           <button
             className={`w-full p-3 rounded-md text-white ${

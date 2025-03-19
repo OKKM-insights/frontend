@@ -1,61 +1,147 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import Header from '@/components/Header';
 import ProgressData from '@/components/ProgressData';
 import WorkPerformance from '@/components/WorkPerformance';
 import DataInsights from '@/components/DatasetInsights';
-import QualityData from '@/components/QualityData';
+//import QualityData from '@/components/QualityData';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Download } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
+import axios from 'axios';
+
+interface UserInfo {
+    profile_picture: string;
+    first_name: string;
+    creation_date: string;
+}
+
+interface TopLabeller {
+    num_labels: number | null;
+    user_info: UserInfo | null;
+}
+
+type Stats = {
+    progressData: any;
+    qualityData: any;
+    workforceData: any;
+    categoryData: any;
+  };
+
+function timeAgo(lastLabelTime: string): string {
+    if (lastLabelTime === "0") return "No Labels";
+    const lastDate = new Date(lastLabelTime);
+    const now = new Date();
+    const diffMs = now.getTime() - lastDate.getTime(); // Difference in milliseconds
+
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 1) return "Just now";
+    if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    return diffDays === 1 ? `${diffDays} day ago` : `${diffDays} days ago`;
+}
+
+function timeRemaining(projectEndDate: string): string {
+    const endDate = new Date(projectEndDate);
+    const now = new Date();
+    const diffMs = endDate.getTime() - now.getTime(); // Difference in milliseconds
+
+    if (diffMs <= 0) return "Project ended";
+
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (diffDays > 0) return diffDays === 1 ? `${diffDays} day remaining` : `${diffDays} days remaining`;
+    if (diffHours > 0) return `${diffHours} hours remaining`;
+    return `${diffMinutes} minutes remaining`;
+}
 
 
 const ProjectInsights: React.FC = () => {
+    const { id } = useParams();
     const router = useRouter();
     const { user, loading } = useAuth();
+    const [stats, setStats] =  useState<Stats | null>(null);
+    const [loadingStats, setLoadingStats] = useState(true);
+    const [error, setError] = useState();
 
     useEffect(() => {
-    if (!loading && !(user?.userType === "client")) {
-        router.push('/');
-    }
+        if (!loading && !(user?.userType === "client")) {
+            router.push('/');
+        }
     }, [user, router, loading]);
 
-    if (!user) {
+    useEffect(() => {
+        //const url = `https://api.orbitwatch.xyz/api/client_projects?clientId=${user?.id}`
+      const url = `https://label.orbitwatch.xyz/1.0/get_report`
+      axios
+        .get(url, {
+            headers: {
+                "projectId": id,
+            },
+        })
+        .then((response) => {
+            console.log(response.data)
+            const stats = response.data;
+            const progressData = {
+                completionPercentage: Math.min(Math.ceil(stats.num_labels / 2), 100),
+                recentActivity: timeAgo(stats.last_label_time),
+                timeRemaining: timeRemaining(stats.project_end_date)
+            }
+        
+            const qualityData = {
+                accuracyRate: 92,
+                disputedLabels: 215,
+                reviewProgress: 70
+            }
+            const workforceData = {
+                avgLabel: stats.avg_num_labels,
+                totalLabelers: stats.num_labellers,
+                topPerformers : Object.values(stats.top_labellers as Record<number, TopLabeller> || {})
+                                        .filter((info: TopLabeller) => info.num_labels !== null)
+                                        .map((info: TopLabeller) => ({
+                                            name: info.user_info ? info.user_info.first_name : "Unknown",
+                                            contribution: info.num_labels!,
+                                            profile: info.user_info?.profile_picture ? info.user_info.profile_picture : ""
+                                        }))
+            }
+            
+            const categoryData = {
+                categoryData : Object.entries(stats.category_data)
+                                        .map(([name, value]) => ({
+                                            name,
+                                            value
+                                        })),
+                totalLabels: stats.num_labels
+            }
+
+            const data = {progressData, qualityData, workforceData, categoryData}
+            console.log(data)
+            setStats(data);
+            setLoadingStats(false);
+
+        })
+        .catch((error) => {
+          console.error(error);
+          setError(error.response?.data?.error || "Failed to load project stats");
+          setLoadingStats(false);
+        });
+    }, [user, id, loading]);
+
+    if (!user || loadingStats) {
         return <LoadingSpinner />;
     }
-    const progressData = {
-        completionPercentage: 100,
-        labeledPhotos: 6500,
-        totalPhotos: 10000,
-        timeRemaining: "3 days 5 hours"
-    }
 
-    const qualityData = {
-        accuracyRate: 92,
-        disputedLabels: 215,
-        reviewProgress: 70
-    }
-    const workforceData = {
-        avgLabelSpeed: 45,
-        totalLabelers: 12,
-        topPerformers: [
-            { name: "Alice", contribution: 1200, accuracy: 98 },
-            { name: "Bob", contribution: 1100, accuracy: 97 },
-            { name: "Charlie", contribution: 1000, accuracy: 96 }
-        ]
-    }
-    
-    const categoryData = [
-        { name: 'Building', value: 4000 },
-        { name: 'Vehicle', value: 3000 },
-        { name: 'Vegetation', value: 2000 },
-        { name: 'Water', value: 1000 },
-    ]
+    if (error) return <p>Error: {error}</p>;
     return (
         <>
             <Header status='logged_in'/>
@@ -65,7 +151,7 @@ const ProjectInsights: React.FC = () => {
                         <ArrowLeft className="h-4 w-4 text-white group-hover:text-black" />
                     </Button>
                     <h1 className="text-3xl font-bold text-center text-white">Project Information</h1>
-                    {progressData.completionPercentage === 100 && <Button
+                    {stats?.progressData.completionPercentage === 100 && <Button
                         onClick={() => console.log("Right Button Clicked")}
                         className="ml-auto group bg-white text-black"
                     >
@@ -75,10 +161,10 @@ const ProjectInsights: React.FC = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-8">
-                    <ProgressData {...progressData} />
-                    <WorkPerformance {...workforceData} />
-                    <DataInsights categoryData={categoryData} />
-                    <QualityData {...qualityData} />
+                    <ProgressData {...stats?.progressData} />
+                    <WorkPerformance {...stats?.workforceData} />
+                    <DataInsights {...stats?.categoryData} />
+                    {/* <QualityData {...stats?.qualityData} /> */}
                 </div>
             </div>
         </>

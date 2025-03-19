@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import ProjectTile from "./ProjectTile";
 import { ProjectSectionProps } from "@/types";
 
-const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects, color }) => {
+const ProjectSection: React.FC<ProjectSectionProps> = ({triggerReload, title, projects, color }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -34,7 +34,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({ title, projects, color 
       >
         {projects.length > 0 ? (
           projects.map((project) => (
-            <ProjectTile key={project.id} project={project} />
+            <ProjectTile triggerReload={triggerReload} key={project.id} project={project} />
           ))
         ) : (
           <p className="text-gray-400 text-xl text-center w-full my-5">
