@@ -18,7 +18,6 @@ const LabelStudioUI = ({id, userId}) => {
       //const url = `http://localhost:5050/api/project/${id}`
       const url = `https://api.orbitwatch.xyz/api/project/${id}`
       const response = await axios.get(url);
-      console.log(response.data)
       const categoriesString = response.data.categories;
       setLabels(categoriesString.split(',').map(category => category.trim()));
       // Fetch images once the project details are available
@@ -36,7 +35,6 @@ const LabelStudioUI = ({id, userId}) => {
       //const url = `http://localhost:5050/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}&userId=${userId}`
       const url = `https://api.orbitwatch.xyz/api/getImages?projectId=${id}&limit=${limit}&offset=${offset}&userId=${userId}`
       const response = await axios.get(url);
-      console.log(response.data.images)
       setImages(prevImages => [...prevImages, ...response.data.images]);
       setOffset(curr => curr + limit)
     } catch (error) {
@@ -102,8 +100,6 @@ const LabelStudioUI = ({id, userId}) => {
       });
     }
 
-    console.log(labelData)
-
     // let url = "http://3.93.145.140/1.0/push_label";
     let url = "https://label.orbitwatch.xyz/1.0/push_label";
     axios.post(url, { labels: labelData })
@@ -165,7 +161,6 @@ const LabelStudioUI = ({id, userId}) => {
 
       onSubmitAnnotation: function (LS, annotation) {// eslint-disable-line @typescript-eslint/no-unused-vars
         // Dont allow submits on nothing
-        console.log(annotation.serializeAnnotation());
         let results = annotation.serializeAnnotation()
         if (results.length !== 0){
           handleImageProcessed();

@@ -48,15 +48,11 @@ export default function NewProjDialog() {
       setProjectCategoryError("")
     }
 
-    console.log(formValues)
-    
-
     // // send request to back end
     //const url = "http://localhost:5050/api/create_project"
     const url = "https://api.orbitwatch.xyz/api/create_project"
     axios.post(url, formData).then(response => {
       if (response.status === 200) {
-        console.log("Form submitted successfully")
         // Do something on success, like showing a success message or resetting the form
         setOpen(false)
         setShowSuccessPopup(true);
