@@ -41,8 +41,8 @@ const ProjectHub: React.FC = () => {
   useEffect(() => {
     if (!loading){
       setLoadingProjects(true);
-      //const url = `https://api.orbitwatch.xyz/api/client_projects?clientId=${user?.id}`
-      const url = `http://localhost:5050/api/client_projects?clientId=${user?.id}`
+      const url = `https://api.orbitwatch.xyz/api/client_projects?clientId=${user?.id}`
+      //const url = `http://localhost:5050/api/client_projects?clientId=${user?.id}`
       axios
         .get(url)
         .then((response) => {

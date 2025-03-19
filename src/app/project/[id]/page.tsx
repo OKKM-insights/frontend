@@ -34,6 +34,7 @@ type Stats = {
   };
 
 function timeAgo(lastLabelTime: string): string {
+    if (lastLabelTime === "0") return "No Labels";
     const lastDate = new Date(lastLabelTime);
     const now = new Date();
     const diffMs = now.getTime() - lastDate.getTime(); // Difference in milliseconds
