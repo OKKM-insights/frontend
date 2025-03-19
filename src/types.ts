@@ -12,23 +12,25 @@ interface Category {
 }
 export interface DataInsightsProps {
     categoryData: Array<Category>;
+    totalLabels: number;
 }
 export interface HeaderProps {
   status: "not_logged_in" | "logged_in";
 }
 export interface ProgressDataProps {
     completionPercentage: number;
-    labeledPhotos: number;
-    totalPhotos: number;
+    recentActivity: string;
     timeRemaining: string;
 }
 export interface ProjectSectionProps {
   title: string;
   projects: Project[];
   color: string;
+  triggerReload?: () => void;
 }
 export interface ProjectTileProps {
   project: Project;
+  triggerReload?: () => void;
 }
 export interface QualityDataProps {
     accuracyRate: number;
@@ -38,10 +40,10 @@ export interface QualityDataProps {
 interface Person {
     name: string;
     contribution: number;
-    accuracy: number;
+    profile: string;
 }
 export interface WorkPerformanceProps {
-    avgLabelSpeed: number;
+    avgLabel: number;
     totalLabelers: number;
     topPerformers: Array<Person>;
 }

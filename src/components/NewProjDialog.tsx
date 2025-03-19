@@ -9,7 +9,7 @@ import { SuccessPopup } from './SuccessPopup'
 import axios from "axios"
 import { Loader } from 'lucide-react'
 
-export default function NewProjDialog() {
+export default function NewProjDialog({ triggerReload }: { triggerReload: () => void }) {
   //const [imageSource, setImageSource] = useState<'upload' | 'request'>('upload');
   const [open, setOpen] = useState(false);
   const [projectNameError, setProjectNameError] = useState("");
@@ -57,6 +57,7 @@ export default function NewProjDialog() {
         setShowSuccessPopup(true);
         setTimeout(() => {
           setShowSuccessPopup(false);
+          triggerReload();
         }, 1500);
       } else {
         console.error("Failed to submit the form")

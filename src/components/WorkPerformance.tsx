@@ -1,11 +1,10 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { WorkPerformanceProps } from '@/types';
 
-export default function WorkPerformance({avgLabelSpeed, totalLabelers, topPerformers} : WorkPerformanceProps) {
-    
+export default function WorkPerformance({avgLabel, totalLabelers, topPerformers} : WorkPerformanceProps) {
     return (
         <Card className="bg-gray-800 text-white h-full flex flex-col">
           <CardHeader>
@@ -15,8 +14,8 @@ export default function WorkPerformance({avgLabelSpeed, totalLabelers, topPerfor
             <div className="space-y-6">
               <div className="flex justify-between text-sm">
                 <div>
-                  <h3 className="font-semibold mb-1 text-white">Avg. Labeling Speed</h3>
-                  <p>{avgLabelSpeed} seconds</p>
+                  <h3 className="font-semibold mb-1 text-white">Avg. Labels</h3>
+                  <p>{avgLabel}</p>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1 text-white">Total Labelers</h3>
@@ -29,13 +28,13 @@ export default function WorkPerformance({avgLabelSpeed, totalLabelers, topPerfor
                   {topPerformers.map((performer, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <Avatar className="h-6 w-6">
+                        <AvatarImage src={`data:image/png;base64,${performer.profile.replace(/^b'|\'$/g, "")}`} alt="User" />
                         <AvatarFallback>{performer.name[0]}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-semibold text-xs">{performer.name}</p>
-                        <p className="text-xs text-gray-400">{performer.contribution} images</p>
+                        <p className="font-semibold text-s">{performer.name}</p>
                       </div>
-                      <Badge variant="secondary" className="text-xs">{performer.accuracy}%</Badge>
+                      <Badge variant="secondary" className="text-xs">{performer.contribution} Labels</Badge>
                     </div>
                   ))}
                 </div>
