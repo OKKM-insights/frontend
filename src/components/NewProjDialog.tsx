@@ -160,7 +160,7 @@ export default function NewProjDialog({ triggerReload }: { triggerReload: () => 
               </div>
               <div className="border-t border-gray-600 pt-4">
                 <Label>Total Estimated Cost</Label>
-                <p className="text-lg font-semibold text-green-400">$232.34</p>
+                <p className="text-lg font-semibold text-green-400">$132.34</p>
                 <p className="text-sm text-gray-400">Final cost may vary based on project complexity</p>
               </div>
               {projectError && (
