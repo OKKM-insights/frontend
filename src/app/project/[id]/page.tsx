@@ -14,6 +14,7 @@ import { Download } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '../../../context/AuthContext';
 import axios from 'axios';
+import MapInsights from '@/components/MapInsights';
 
 interface UserInfo {
     profile_picture: string;
@@ -124,7 +125,9 @@ const ProjectInsights: React.FC = () => {
                 totalLabels: stats.num_labels
             }
 
-            const data = {progressData, qualityData, workforceData, categoryData}
+            const project_id = stats.project_id;
+
+            const data = {progressData, qualityData, workforceData, categoryData, project_id}
             console.log(data)
             setStats(data);
             setLoadingStats(false);
@@ -165,6 +168,7 @@ const ProjectInsights: React.FC = () => {
                     <ProgressData {...stats?.progressData} />
                     <WorkPerformance {...stats?.workforceData} />
                     <DataInsights {...stats?.categoryData} />
+                    <MapInsights id = {id} />
                     {/* <QualityData {...stats?.qualityData} /> */}
                 </div>
             </div>
