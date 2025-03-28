@@ -20,7 +20,7 @@ export default function MapInsights({ id }: MapInsightsProps) {
                             // src={`http://localhost:5050/api/get_original_image?projectId=${id}`}
                             alt="Project map image"
                             className="max-w-full h-auto rounded-md shadow-lg border border-gray-700"
-                            style={{ maxHeight: '400px' }}
+                            style={{ maxHeight: '500px' }}
                             onError={() => setImageError(true)}
                         />
                     ) : (
