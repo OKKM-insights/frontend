@@ -125,9 +125,7 @@ const ProjectInsights: React.FC = () => {
                 totalLabels: stats.num_labels
             }
 
-            const project_id = stats.project_id;
-
-            const data = {progressData, qualityData, workforceData, categoryData, project_id}
+            const data = {progressData, qualityData, workforceData, categoryData}
             console.log(data)
             setStats(data);
             setLoadingStats(false);
