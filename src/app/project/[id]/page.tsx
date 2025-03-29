@@ -14,6 +14,7 @@ import { Download } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '../../../context/AuthContext';
 import axios from 'axios';
+import MapInsights from '@/components/MapInsights';
 
 interface UserInfo {
     profile_picture: string;
@@ -152,19 +153,21 @@ const ProjectInsights: React.FC = () => {
                         <ArrowLeft className="h-4 w-4 text-white group-hover:text-black" />
                     </Button>
                     <h1 className="text-3xl font-bold text-center text-white">Project Information</h1>
-                    {stats?.progressData.completionPercentage === 100 && <Button
+                    <Button
                         onClick={() => console.log("Right Button Clicked")}
                         className="ml-auto group bg-white text-black"
+                        disabled={stats?.progressData.completionPercentage !== 100}
                     >
                         <Download className="mr-2 h-4 w-4" />
                         Export Results
-                    </Button>}
+                    </Button>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-8">
                     <ProgressData {...stats?.progressData} />
                     <WorkPerformance {...stats?.workforceData} />
                     <DataInsights {...stats?.categoryData} />
+                    <MapInsights id = {id} />
                     {/* <QualityData {...stats?.qualityData} /> */}
                 </div>
             </div>

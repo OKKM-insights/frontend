@@ -41,7 +41,7 @@ export default function PhotoLabelingTool({ labels, image, onSubmit }: PhotoLabe
   
   const generateLabelColors = (labels: string[]): Record<string, string> => {
     return labels.reduce((acc, label, index) => {
-      const hue = (index * 360) / labels.length;
+      const hue = ((index * 360) / labels.length + 240) % 360;
       acc[label] = `hsla(${hue}, 80%, 65%, 0.3)`;
       return acc;
     }, {} as Record<string, string>);
