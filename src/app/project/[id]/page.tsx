@@ -82,19 +82,20 @@ const ProjectInsights: React.FC = () => {
     }, [user, router, loading]);
 
     useEffect(() => {
+        if (!user || !id) return;
+        setLoadingStats(true);
         //const url = `https://api.orbitwatch.xyz/api/client_projects?clientId=${user?.id}`
       const url = `https://label.orbitwatch.xyz/1.0/get_report`
-      axios
-        .get(url, {
-            headers: {
-                "projectId": id,
-            },
-        })
-        .then((response) => {
-            console.log(response.data)
-            const stats = response.data;
+        const url2 = `https://api.orbitwatch.xyz/api/client_projects?clientId=${user?.id}`
+      //const url2 = `http://localhost:5050/api/client_projects?clientId=${user?.id}`
+      Promise.all([
+        axios.get(url2),
+        axios.get(url, {headers: {"projectId": id,}})
+      ]).then(([projectsResponse, reportResponse]) => {
+            const stats = reportResponse.data;
+            const progress = projectsResponse.data.projects.find((project:any) => project.id.toString() === id)?.progress;
             const progressData = {
-                completionPercentage: Math.min(Math.ceil(stats.num_labels / 2), 100),
+                completionPercentage: progress ?? 0,
                 recentActivity: timeAgo(stats.last_label_time),
                 timeRemaining: timeRemaining(stats.project_end_date)
             }
@@ -105,7 +106,7 @@ const ProjectInsights: React.FC = () => {
                 reviewProgress: 70
             }
             const workforceData = {
-                avgLabel: stats.avg_num_labels,
+                avgLabel: Math.round(stats.avg_num_labels),
                 totalLabelers: stats.num_labellers,
                 topPerformers : Object.values(stats.top_labellers as Record<number, TopLabeller> || {})
                                         .filter((info: TopLabeller) => info.num_labels !== null)
