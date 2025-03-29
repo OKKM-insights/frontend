@@ -16,8 +16,8 @@ export default function MapInsights({ id }: MapInsightsProps) {
                 <div className="flex justify-center mb-4">
                     {!imageError ? (
                         <img
-                            src={`https://api.orbitwatch.xyz/api/image`}
-                            // src={`https://api.orbitwatch.xyz/api/get_original_image?projectId=${id}`}
+                            // src={`https://api.orbitwatch.xyz/api/image`}
+                            src={`https://api.orbitwatch.xyz/api/get_original_image?projectId=${id}`}
                             // src={`http://localhost:5050/api/get_original_image?projectId=${id}`}
                             alt="Project map image"
                             className="max-w-full h-auto rounded-md shadow-lg border border-gray-700"
