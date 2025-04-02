@@ -49,7 +49,7 @@ export default function RegisterBox() {
       setWrongPassError("")
     }
 
-    // send request to back end
+    // send request to back end to register user
     //const url = 'http://localhost:5050/api/register'
     const url = 'https://api.orbitwatch.xyz/api/register'
     axios.post(url, formValues, {

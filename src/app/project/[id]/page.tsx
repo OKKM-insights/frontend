@@ -6,7 +6,6 @@ import Header from '@/components/Header';
 import ProgressData from '@/components/ProgressData';
 import WorkPerformance from '@/components/WorkPerformance';
 import DataInsights from '@/components/DatasetInsights';
-//import QualityData from '@/components/QualityData';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from 'next/navigation';
@@ -85,13 +84,15 @@ const ProjectInsights: React.FC = () => {
         if (!user || !id) return;
         setLoadingStats(true);
         //const url = `https://api.orbitwatch.xyz/api/client_projects?clientId=${user?.id}`
-      const url = `https://label.orbitwatch.xyz/1.0/get_report`
+        //const url2 = `http://localhost:5050/api/client_projects?clientId=${user?.id}`
+        const url = `https://label.orbitwatch.xyz/1.0/get_report`
         const url2 = `https://api.orbitwatch.xyz/api/client_projects?clientId=${user?.id}`
-      //const url2 = `http://localhost:5050/api/client_projects?clientId=${user?.id}`
-      Promise.all([
-        axios.get(url2),
-        axios.get(url, {headers: {"projectId": id,}})
-      ]).then(([projectsResponse, reportResponse]) => {
+      
+        // retrieve the stats for a project to display
+        Promise.all([
+            axios.get(url2),
+            axios.get(url, {headers: {"projectId": id,}})
+        ]).then(([projectsResponse, reportResponse]) => {
             const stats = reportResponse.data;
             const progress = projectsResponse.data.projects.find((project:any) => project.id.toString() === id)?.progress;
             const progressData = {
@@ -126,8 +127,7 @@ const ProjectInsights: React.FC = () => {
                 totalLabels: stats.num_labels
             }
 
-            const data = {progressData, qualityData, workforceData, categoryData}
-            console.log(data)
+            const data = {progressData, qualityData, workforceData, categoryData};
             setStats(data);
             setLoadingStats(false);
 
@@ -154,7 +154,7 @@ const ProjectInsights: React.FC = () => {
                     </Button>
                     <h1 className="text-3xl font-bold text-center text-white">Project Information</h1>
                     <Button
-                        onClick={() => console.log("Right Button Clicked")}
+                        onClick={() => {}}
                         className="ml-auto group bg-white text-black"
                         disabled={stats?.progressData.completionPercentage !== 100}
                     >
@@ -168,7 +168,6 @@ const ProjectInsights: React.FC = () => {
                     <WorkPerformance {...stats?.workforceData} />
                     <DataInsights {...stats?.categoryData} />
                     <MapInsights id = {id} />
-                    {/* <QualityData {...stats?.qualityData} /> */}
                 </div>
             </div>
         </>

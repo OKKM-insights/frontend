@@ -21,8 +21,7 @@ const LoginBox: React.FC = () => {
 
     // Tell users when credentials are incorrect
     try {
-      const userData = await login(String(formValues['email']), String(formValues['password']), userType);
-      console.log("Logged in user data:", userData);
+      await login(String(formValues['email']), String(formValues['password']), userType);
     } catch (err) {
       const error = err as { status?: number; message?: string };
       setCredsError(
@@ -85,9 +84,6 @@ const LoginBox: React.FC = () => {
         </form>
 
         {/* Links */}
-        {/* <div className="mt-4 text-center">
-          <span onClick={() => router.push("/forgot-password")} className="text-blue-400 hover:text-blue-500 cursor-pointer">Forgot password?</span>
-        </div> */}
         <div className="mt-2 text-center">
           <p className="text-white">Need an account? <span onClick={() => router.push("/register")} className="text-green-400 hover:text-green-500 cursor-pointer">Register here</span></p>
         </div>

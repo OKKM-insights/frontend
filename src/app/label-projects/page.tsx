@@ -28,6 +28,7 @@ const LabelHub: React.FC = () => {
     if (!loading) {
       //const url = `http://localhost:5050/api/projects?userId=${user?.id}`
       const url = `https://api.orbitwatch.xyz/api/projects?userId=${user?.id}`
+      // retrieve all the live projects for labellers to label
       axios
         .get(url)
         .then((response) => {
