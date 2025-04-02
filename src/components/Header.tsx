@@ -45,9 +45,6 @@ const Header: React.FC<HeaderProps> = ({status}) => {
       <div className="flex items-center space-x-2">
         {status === "logged_in" ?
           <>
-            {/* <div className="text-white mr-4">
-              <span className="ml-1 font-semibold">$XXXX.XX</span>
-            </div> */}
             <Avatar onClick={goToInfo} className="cursor-pointer" data-testid="user-avatar">
               <AvatarImage src={`data:image/png;base64,${user?.profilePicture}`} alt="User" />
               <AvatarFallback>
