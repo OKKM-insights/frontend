@@ -552,7 +552,8 @@ useEffect(() => {
                   </Tooltip>
                 </div>
 
-                <Separator orientation="vertical" className="h-6 mx-1" />
+                {/* <Separator orientation="vertical" className="h-6 mx-1" /> */}
+                <Separator orientation="vertical" className="hidden sm:block h-6 mx-1" />
 
                 {/* Image Adjustments */}
                 <div className="flex items-center gap-3 adjust-tools">
@@ -591,7 +592,8 @@ useEffect(() => {
                   </Tooltip>
                 </div>
 
-                <Separator orientation="vertical" className="h-6 mx-1" />
+                {/* <Separator orientation="vertical" className="h-6 mx-1" /> */}
+                <Separator orientation="vertical" className="hidden sm:block h-6 mx-1" />
 
                 {/* View/Tool Controls */}
                 <div className="flex items-center gap-2">
