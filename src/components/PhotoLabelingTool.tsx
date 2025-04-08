@@ -514,10 +514,10 @@ useEffect(() => {
         </div>
 
         <div className="flex justify-center labeling-toolbar">
-          <div className="rounded-lg border bg-card p-2 inline-block">
-            <div className="flex items-center gap-2">
-                {/* Canvas Controls */}
-                <div className="flex items-center gap-1 zoom-controls">
+            <div className="rounded-lg border bg-card p-2 inline-block w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-2">
+                    {/* Canvas Controls */}
+                    <div className="flex items-center gap-1 zoom-controls">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="outline" size="icon" onClick={() => handleZoom(Math.max(1, zoom - 0.1))}>
