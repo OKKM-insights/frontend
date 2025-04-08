@@ -514,10 +514,10 @@ useEffect(() => {
         </div>
 
         <div className="flex justify-center labeling-toolbar">
-          <div className="rounded-lg border bg-card p-2 inline-block">
-            <div className="flex items-center gap-2">
-                {/* Canvas Controls */}
-                <div className="flex items-center gap-1 zoom-controls">
+            <div className="rounded-lg border bg-card p-2 inline-block w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-2">
+                    {/* Canvas Controls */}
+                    <div className="flex items-center gap-1 zoom-controls">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="outline" size="icon" onClick={() => handleZoom(Math.max(1, zoom - 0.1))}>
@@ -552,7 +552,8 @@ useEffect(() => {
                   </Tooltip>
                 </div>
 
-                <Separator orientation="vertical" className="h-6 mx-1" />
+                {/* <Separator orientation="vertical" className="h-6 mx-1" /> */}
+                <Separator orientation="vertical" className="hidden sm:block h-6 mx-1" />
 
                 {/* Image Adjustments */}
                 <div className="flex items-center gap-3 adjust-tools">
@@ -591,7 +592,8 @@ useEffect(() => {
                   </Tooltip>
                 </div>
 
-                <Separator orientation="vertical" className="h-6 mx-1" />
+                {/* <Separator orientation="vertical" className="h-6 mx-1" /> */}
+                <Separator orientation="vertical" className="hidden sm:block h-6 mx-1" />
 
                 {/* View/Tool Controls */}
                 <div className="flex items-center gap-2">
@@ -636,7 +638,8 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="flex justify-center gap-3">
+        {/* <div className="flex justify-center gap-3"> */}
+        <div className="flex flex-col sm:flex-row justify-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline" onClick={() => nothingToLabel()} className="flex items-center gap-2 no-labels">
