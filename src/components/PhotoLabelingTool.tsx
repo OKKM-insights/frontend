@@ -638,7 +638,8 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="flex justify-center gap-3">
+        {/* <div className="flex justify-center gap-3"> */}
+        <div className="flex flex-col sm:flex-row justify-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline" onClick={() => nothingToLabel()} className="flex items-center gap-2 no-labels">
